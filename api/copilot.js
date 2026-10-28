@@ -192,21 +192,27 @@ module.exports = async function handler(req, res) {
 
   const result = await upstream.json().catch(() => ({}));
 
-  if (!upstream.ok) {
-    const status = upstream.status === 429
-      ? 429
-      : upstream.status === 400
-        ? 400
-        : 502;
 
-    const message = upstream.status === 429
-      ? "Gemini's current rate limit has been reached. Please wait and try again."
-      : upstream.status === 400
-        ? "Gemini rejected the request. Check model availability and API access."
-        : "The AI provider is temporarily unavailable. Please try again later.";
+if (!upstream.ok) {
+  const providerMessage =
+    result?.error?.message ||
+    result?.error?.status ||
+    "No details returned by Gemini";
 
-    return res.status(status).json({ error: message });
-  }
+  console.error("Gemini request failed", {
+    status: upstream.status,
+    message: providerMessage
+  });
+
+  const status =
+    upstream.status === 429 ? 429 :
+    upstream.status === 400 ? 400 : 502;
+
+  return res.status(status).json({
+    error: `Gemini API error ${upstream.status}: ${providerMessage}`
+  });
+}
+
 
   const answer = (result.candidates || [])
     .flatMap((candidate) =>
