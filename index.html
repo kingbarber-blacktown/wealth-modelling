@@ -364,9 +364,6 @@ function aiAnswer(text,isError){var el=$('ai-answer');el.textContent=text;el.cla
 async function askWealthCopilot(){
   var question=$('ai-question').value.trim();
   if(!question){aiSetStatus('Add a question first');$('ai-question').focus();return;}
-  if(!/^https:\/\/.+\.workers\.dev(?:\/.*)?$/.test(AI_API_URL)||AI_API_URL.indexOf('YOUR-WORKER-NAME')!==-1||AI_API_URL.indexOf('YOUR-SUBDOMAIN')!==-1){
-    aiSetStatus('Setup needed');aiAnswer('The AI backend is not connected yet. After deploying your Cloudflare Worker, replace AI_API_URL in this HTML with the Worker URL, then publish the updated index.html.',true);return;
-  }
   var btn=$('ai-send');btn.disabled=true;btn.textContent='Thinking…';aiSetStatus('Connecting to Gemini…');aiAnswer('');
   try{
     var controller=new AbortController();var timeout=setTimeout(function(){controller.abort();},45000);
