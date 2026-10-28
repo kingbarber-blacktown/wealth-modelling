@@ -4,7 +4,7 @@ const ALLOWED_ORIGINS = new Set([
   "https://wealth-modelling.vercel.app"
 ]);
 
-const MODEL = "gemini-3.8-flash";
+const MODEL = "gemini-3.5-flash-lite";
 const MAX_QUESTION_CHARS = 1600;
 const MAX_CONTEXT_CHARS = 14000;
 const MAX_BODY_CHARS = 20000;
