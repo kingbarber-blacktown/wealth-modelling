@@ -337,7 +337,7 @@ function bindInfoButtons(){
 }
 
 // AI Wealth Copilot integration. Set this to the URL of your deployed Cloudflare Worker.
-var AI_API_URL = 'https://wealth-copilot-api.forgamesandwebsitesonly.workers.dev/';
+var AI_API_URL = "https://wealth-modelling.vercel.app/api/copilot";
 function aiSnapshot(){
   var inputs={};
   Object.keys(S).forEach(function(k){var v=S[k];if(typeof v==='number'||typeof v==='boolean'||typeof v==='string')inputs[k]=v;});
