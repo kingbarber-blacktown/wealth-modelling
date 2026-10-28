@@ -1,0 +1,800 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>5-7-10 Wealth Model</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: result cards on top, chart column on the left, sticky parameter panel on the right.
+   On phones the panel drops under the charts. Series colours follow a fixed categorical order:
+   blue = optimized net worth, orange = standard DCA, aqua = optimized portfolio, yellow = HYSA. */
+:root {
+  --font-ui: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-num: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --bg: #f3f4f6;
+  --surface: #fcfcfb;
+  --field: #ffffff;
+  --ink: #14161a;
+  --muted: #52514e;
+  --line: #d9dbe0;
+  --grid: #e9eaed;
+  --hl: #e8f0fb;
+  --s1: #2a78d6;
+  --s2: #eb6834;
+  --s3: #1baf7a;
+  --s4: #eda100;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111214; --surface: #1a1a19; --field: #232322; --ink: #f0efec; --muted: #c3c2b7;
+    --line: #3a3a38; --grid: #2b2b2a; --hl: #1f2a38;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111214; --surface: #1a1a19; --field: #232322; --ink: #f0efec; --muted: #c3c2b7;
+  --line: #3a3a38; --grid: #2b2b2a; --hl: #1f2a38;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 15px/1.5 var(--font-ui);
+  padding-block: 12px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+html, body { height: 100%; }
+.wrap { max-width: 1440px; margin: 0 auto; height: 100%; }
+h1 { font-size: clamp(22px, 3vw, 28px); font-weight: 600; letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+h2 { font-size: 14px; font-weight: 600; margin: 0; }
+.sub { color: var(--muted); margin: 6px 0 0; max-width: 70ch; }
+.eyebrow { font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 500; margin: 22px 0 10px; }
+
+.cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; min-width: 0; }
+.card .lab { display: flex; align-items: center; gap: 8px; font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.sw { width: 9px; height: 9px; border-radius: 2px; background: var(--c, var(--ink)); flex: none; }
+.card .val { font: 500 clamp(17px, 1.7vw, 24px)/1.2 var(--font-num); font-variant-numeric: tabular-nums; margin-top: 8px; overflow-wrap: anywhere; }
+.card .note { font-size: 12.5px; color: var(--muted); margin-top: 4px; font-variant-numeric: tabular-nums; }
+
+/* two panes: sliders on the left, results on the right, each scrolling on its own */
+.app { display: grid; grid-template-columns: clamp(240px, 32vw, 360px) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); gap: 16px; height: 100%; }
+.panel, .results { min-height: 0; min-width: 0; overflow-y: auto; overscroll-behavior: contain; }
+.results { display: flex; flex-direction: column; gap: 12px; }
+.results > * { flex: none; }
+.live { display: flex; flex-direction: column; gap: 12px; min-height: 100%; }
+.live > * { flex: none; }
+.live > .chartbox { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 300px; }
+.chartbox .cbox { flex: 1 1 0; min-height: 0; height: auto; }
+.results .eyebrow { margin: 6px 0 -4px; }
+.results .tgt { margin-top: 0; }
+.main { display: grid; gap: 16px; min-width: 0; }
+.box { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; min-width: 0; }
+.boxhead { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; margin-bottom: 12px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px; }
+.lg { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: transparent; color: var(--ink); border-radius: 999px; padding: 4px 12px 4px 9px; font: inherit; font-size: 12.5px; cursor: pointer; }
+.lg i { display: block; width: 18px; height: 0; border-top: 3px solid var(--c); }
+.lg i.dash { border-top-style: dashed; }
+.lg i.dot { border-top-style: dotted; }
+.lg[aria-pressed="false"] { color: var(--muted); }
+.lg[aria-pressed="false"] i { opacity: 0.35; }
+.lg:hover { border-color: var(--muted); }
+button:focus-visible, input:focus-visible, summary:focus-visible { outline: 2px solid var(--s1); outline-offset: 2px; }
+.cbox { position: relative; height: 300px; }
+.cbox canvas { position: absolute; inset: 0; }
+.cbox.sm { height: 170px; margin-top: 10px; }
+.status { font-size: 13px; color: var(--muted); margin: 12px 0 0; max-width: 90ch; }
+.status strong { color: var(--ink); font-weight: 500; }
+
+details summary { cursor: pointer; font-size: 14px; font-weight: 600; }
+.tablewrap { overflow-x: auto; margin-top: 12px; max-height: 420px; overflow-y: auto; }
+table { border-collapse: collapse; width: 100%; font: 400 12.5px var(--font-num); font-variant-numeric: tabular-nums; }
+th, td { padding: 6px 10px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { position: sticky; top: 0; background: var(--surface); color: var(--muted); font-weight: 500; }
+th:first-child, td:first-child { text-align: left; }
+tr.crash td { background: var(--hl); }
+.notes { font-size: 12.5px; color: var(--muted); max-width: 88ch; margin: 0; display: grid; gap: 6px; }
+.notes p { margin: 0; }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+.panelhead { display: flex; align-items: center; justify-content: space-between; }
+#reset { font: inherit; font-size: 12.5px; color: var(--ink); background: transparent; border: 1px solid var(--line); border-radius: 6px; padding: 3px 10px; cursor: pointer; }
+#reset:hover { border-color: var(--muted); }
+.grp { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+.grp:first-of-type { margin-top: 12px; }
+.grp h3 { font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 500; margin: 0; }
+.row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 10px; align-items: center; margin-top: 12px; }
+.row label { font-size: 13.5px; min-width: 0; }
+.row.off { opacity: 0.42; }
+.num { display: inline-flex; align-items: center; gap: 3px; font: 400 13px var(--font-num); background: var(--field); border: 1px solid var(--line); border-radius: 6px; padding: 3px 8px; color: var(--ink); }
+.num:focus-within { outline: 2px solid var(--s1); outline-offset: 1px; }
+.num input { width: 9ch; border: 0; background: transparent; color: inherit; font: inherit; text-align: right; padding: 0; outline: none; }
+.row input[type=range] { grid-column: 1 / -1; width: 100%; margin: 0; accent-color: var(--s1); }
+.tog { display: flex; gap: 10px; align-items: flex-start; font-size: 13.5px; font-weight: 500; margin-top: 12px; cursor: pointer; }
+.tog input { margin: 3px 0 0; accent-color: var(--s1); }
+.tog.off { opacity: 0.42; }
+.hint { font-size: 12.5px; color: var(--muted); margin: 6px 0 0; }
+.pill { display: inline-block; font-size: 11px; border: 1px solid var(--line); border-radius: 999px; padding: 0 7px; margin-left: 4px; color: var(--muted); }
+.pill.hit { color: var(--ink); border-color: var(--s1); }
+.pill:empty { display: none; }
+
+.tgt { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 32px; margin-top: 12px; }
+.tgt-k { font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.tgt-v { font: 500 clamp(19px, 2.2vw, 24px)/1.3 var(--font-num); font-variant-numeric: tabular-nums; margin-top: 2px; }
+.tgt-note { flex: 1 1 340px; font-size: 13px; color: var(--muted); min-width: 0; }
+.tgt-note strong { color: var(--ink); font-weight: 500; }
+
+@media (max-width: 1100px) { .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* small laptop windows: trim the extras so the chart keeps its height */
+@media (max-height: 720px) {
+  .sub { display: none; }
+  .card .note { display: none; }
+  .card { padding: 10px 14px; }
+  .tgt { padding: 10px 14px; }
+  .tgt-note { font-size: 12px; }
+  .status { display: none; }
+  .boxhead { margin-bottom: 8px; flex-wrap: nowrap; }
+  .legend { flex: 1 1 0; min-width: 0; flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; }
+  .lg { flex: none; white-space: nowrap; }
+  .live > .chartbox { min-height: 240px; }
+}
+
+/* short screens, such as a phone held sideways: tighter spacing so the chart stays in view */
+@media (max-height: 520px) {
+  body { padding-block: 8px; }
+  .app { gap: 10px; }
+  .results { gap: 8px; }
+  h1 { font-size: 17px; }
+  header { display: none; }
+  .results .eyebrow { margin: 0 0 -2px; font-size: 10.5px; }
+  .cards { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .card { padding: 7px 9px; }
+  .card .lab { font-size: 9.5px; letter-spacing: 0.04em; }
+  .card .val { font-size: clamp(12px, 1.5vw, 14px); margin-top: 3px; }
+  .card .note { display: none; }
+  .tgt { padding: 7px 10px; gap: 2px 14px; }
+  .tgt-note { display: none; }
+  .tgt-v { font-size: 15px; }
+  .box { padding: 10px; }
+  .boxhead { margin-bottom: 6px; gap: 6px 10px; }
+  .legend { flex-wrap: nowrap; overflow-x: auto; width: 100%; min-width: 0; }
+  .lg { padding: 2px 8px 2px 6px; font-size: 10.5px; gap: 6px; flex: none; white-space: nowrap; }
+  .lg i { width: 12px; }
+  .live > .chartbox { min-height: 200px; }
+  .status { display: none; }
+  .boxhead h2 { display: none; }
+  .tgt-head { display: flex; align-items: baseline; gap: 4px 12px; flex-wrap: wrap; }
+  .cbox.sm { height: 130px; }
+  .panel { padding: 10px 12px; }
+  .grp { margin-top: 12px; padding-top: 10px; }
+  .row { margin-top: 8px; }
+  .row label { font-size: 12.5px; }
+}
+@media (max-height: 520px) and (max-width: 699px) { .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } .results .eyebrow { display: none; } }
+
+/* narrow portrait phones: stack, charts first */
+@media (max-width: 560px) {
+  html, body, .wrap, .app { height: auto; }
+  .app { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; }
+  .panel, .results { overflow: visible; }
+  .results { order: -1; }
+  .live { min-height: 0; }
+  .live > .chartbox { flex: none; min-height: 0; }
+  .chartbox .cbox { flex: none; height: 300px; }
+}
+@media (pointer: coarse) { .row input[type=range] { height: 26px; } }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+
+<div class="wrap">
+  <div class="app">
+  <aside class="panel" aria-label="Parameters">
+    <div class="panelhead"><h2>Parameters</h2><button id="reset" type="button">Reset</button></div>
+    <div id="controls"></div>
+  </aside>
+  <div class="results">
+  <div class="live">
+  <header>
+    <h1>5-7-10 Wealth Model</h1>
+    <p class="sub">Fortnightly NDQ contributions and an HYSA cash reserve, with tiered cash deployments when the market falls. All figures in AUD.</p>
+  </header>
+
+  <h2 class="eyebrow" id="atyear">At the end of the horizon</h2>
+  <section class="cards" aria-labelledby="atyear">
+    <div class="card" style="--c: var(--s1)">
+      <div class="lab"><span class="sw"></span>Total net worth</div>
+      <div class="val" id="c-nw">-</div>
+      <div class="note" id="c-nw-n"></div>
+    </div>
+    <div class="card" style="--c: var(--s3)">
+      <div class="lab"><span class="sw"></span>Investment portfolio</div>
+      <div class="val" id="c-port">-</div>
+      <div class="note" id="c-port-n"></div>
+    </div>
+    <div class="card" style="--c: var(--s4)">
+      <div class="lab"><span class="sw"></span>Remaining HYSA cash</div>
+      <div class="val" id="c-hysa">-</div>
+      <div class="note" id="c-hysa-n"></div>
+    </div>
+    <div class="card">
+      <div class="lab"><span class="sw"></span>Alpha vs standard DCA</div>
+      <div class="val" id="c-alpha">-</div>
+      <div class="note" id="c-alpha-n"></div>
+    </div>
+  </section>
+
+  <section class="box tgt" aria-live="polite" aria-label="Target check">
+    <div class="tgt-head"><div class="tgt-k" id="tgt-k"></div><div class="tgt-v" id="tgt-v">-</div></div>
+    <div class="tgt-note" id="tgt-note"></div>
+  </section>
+
+  <section class="box chartbox" aria-labelledby="h-cap">
+    <div class="boxhead">
+      <h2 id="h-cap">Capital over time</h2>
+      <div class="legend" id="legend"></div>
+    </div>
+    <div class="cbox"><canvas id="main" role="img" aria-label="Line chart of total capital over time"></canvas></div>
+    <p class="status" id="status"></p>
+  </section>
+  </div>
+
+    <div class="main">
+      <section class="box" aria-labelledby="h-alpha">
+        <h2 id="h-alpha">Alpha versus standard DCA</h2>
+        <div class="cbox sm"><canvas id="alpha" role="img" aria-label="Line chart of alpha over time"></canvas></div>
+      </section>
+
+      <section class="box">
+        <details>
+          <summary id="tbl-sum">Year-by-year table</summary>
+          <div class="tablewrap">
+            <table>
+              <thead>
+                <tr><th>Year</th><th>Age</th><th>Standard DCA</th><th>Optimized portfolio</th><th>Optimized HYSA</th><th>Optimized net worth</th><th>Alpha</th></tr>
+              </thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <div class="notes">
+        <p>Each year has 26 fortnights. Equity growth is the annual rate divided by 26 per fortnight, and each contribution lands after that fortnight's growth. HYSA interest is credited monthly, so a Year 3 transfer follows exactly 36 months of interest.</p>
+        <p>DCA amounts are in today's dollars. With a yearly raise they step up at the start of each year, and the amount after the step-down age rises the same way.</p>
+        <p>Cash tiers move at the end of the crash year. A tier deploys only what the HYSA still holds.</p>
+        <p>With prices left on trend, alpha is only the gap between the equity return and the HYSA rate on the cash that moved. Turn on the drawdown option to also model buying at the lows. These are projections from assumed returns, not a forecast.</p>
+      </div>
+    </div>
+  </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+
+  // ENGINE START
+  var PPY = 26;
+  function simulate(P, deploy) {
+    var N = P.years * PPY;
+    var g = P.eq / 100 / PPY;
+    var m = P.hy / 100 / 12;
+    var cp = P.crashOn ? P.crashYear * PPY : -1;
+    var dcaEnd = (P.stopAge - P.age) * PPY;
+    var R = P.recovery * PPY;
+    var d = P.depth / 100;
+    var tiers = [[20, P.t1], [30, P.t2], [40, P.t3]];
+    var units = P.port0;
+    var hysa = P.hysa0, monthsDone = 0, deployed = 0, fired = 0, hysaAfter = null;
+    var trend = 1;
+    var port = new Float64Array(N + 1), hy = new Float64Array(N + 1);
+    port[0] = P.port0; hy[0] = P.hysa0;
+    for (var i = 1; i <= N; i++) {
+      trend *= 1 + g;
+      var shock = 1;
+      if (P.priceOn && cp > 0 && i >= cp && i < cp + R) shock = 1 - d * (1 - (i - cp) / R);
+      var price = trend * shock;
+      var amt = (i <= dcaEnd ? P.dca : P.postDca) * Math.pow(1 + P.raise / 100, Math.floor((i - 1) / PPY));
+      units += amt / price;
+      var target = Math.floor((12 * i) / PPY);
+      while (monthsDone < target) { hysa *= 1 + m; monthsDone++; }
+      if (deploy && i === cp) {
+        for (var k = 0; k < tiers.length; k++) {
+          if (P.depth >= tiers[k][0]) {
+            var take = Math.min(tiers[k][1], hysa);
+            hysa -= take; units += take / price; deployed += take; fired++;
+          }
+        }
+        hysaAfter = hysa;
+      }
+      port[i] = units * price; hy[i] = hysa;
+    }
+    return { N: N, port: port, hy: hy, deployed: deployed, fired: fired, hysaAfter: hysaAfter };
+  }
+  // ENGINE END
+
+  /* ---------- controls ---------- */
+  var CTL = [
+    { grp: 'Starting position', items: [
+      { id: 'age', label: 'Current age', min: 16, max: 60, step: 1, def: 21, suf: 'yrs' },
+      { id: 'port0', label: 'Current portfolio', min: 0, max: 1000000, step: 1, def: 44378, pre: '$' },
+      { id: 'hysa0', label: 'HYSA cash reserve', min: 0, max: 300000, step: 500, def: 43000, pre: '$' }
+    ]},
+    { grp: 'Investing', items: [
+      { id: 'dca', label: 'Fortnightly DCA', min: 0, max: 10000, step: 50, def: 1600, pre: '$' },
+      { id: 'raise', label: 'Yearly DCA raise', min: 0, max: 8, step: 0.1, def: 0, suf: '%' },
+      { id: 'stopAge', label: 'Full DCA until age', min: 21, max: 44, step: 1, def: 44, suf: 'yrs', pill: true },
+      { id: 'postDca', label: 'DCA after that age', min: 0, max: 5000, step: 50, def: 0, pre: '$' },
+      { id: 'eq', label: 'Equity return, p.a.', min: 0, max: 25, step: 0.1, def: 11, suf: '%' },
+      { id: 'hy', label: 'HYSA rate, p.a.', min: 0, max: 10, step: 0.1, def: 5.9, suf: '%' },
+      { id: 'years', label: 'Time horizon', min: 5, max: 40, step: 1, def: 23, suf: 'yrs' }
+    ]},
+    { grp: 'Inflation', toggle: { id: 'realOn', label: "Show values in today's dollars", def: false,
+        hint: "Charts, cards and the table are divided by inflation, so a dollar in year 20 counts for what it buys today. The target is read in whichever dollars are showing." }, items: [
+      { id: 'infl', label: 'Inflation, p.a.', min: 0, max: 8, step: 0.1, def: 2.5, suf: '%', needs: ['realOn'] }
+    ]},
+    { grp: 'Target', items: [
+      { id: 'target', label: 'Target net worth', min: 500000, max: 10000000, step: 50000, def: 4000000, pre: '$' }
+    ]},
+    { grp: 'Crash engine', toggle: { id: 'crashOn', label: 'Simulate a crash', def: true }, items: [
+      { id: 'crashYear', label: 'Crash happens in year', min: 1, max: 23, step: 1, def: 3, needs: ['crashOn'] },
+      { id: 'depth', label: 'Drawdown depth', min: 0, max: 60, step: 1, def: 40, pre: '−', suf: '%', needs: ['crashOn'] },
+      { id: 't1', label: 'Tier 1 (−20%)', min: 0, max: 25000, step: 500, def: 5000, pre: '$', pill: 20, needs: ['crashOn'] },
+      { id: 't2', label: 'Tier 2 (−30%)', min: 0, max: 25000, step: 500, def: 7000, pre: '$', pill: 30, needs: ['crashOn'] },
+      { id: 't3', label: 'Tier 3 (−40%)', min: 0, max: 25000, step: 500, def: 10000, pre: '$', pill: 40, needs: ['crashOn'] }
+    ]},
+    { grp: 'Share prices', toggle: { id: 'priceOn', label: 'Apply the drawdown to share prices', def: false, needs: ['crashOn'],
+        hint: 'Off, prices follow your steady return and the crash only triggers the cash transfers. On, prices drop by the drawdown depth in the crash year, then recover in a straight line, for both strategies.' }, items: [
+      { id: 'recovery', label: 'Recovery time', min: 1, max: 6, step: 1, def: 2, suf: 'yrs', needs: ['crashOn', 'priceOn'] }
+    ]}
+  ];
+
+  var S = { stopAtEnd: true }, byId = {}, toggles = {};
+  CTL.forEach(function (g) {
+    if (g.toggle) { S[g.toggle.id] = g.toggle.def; toggles[g.toggle.id] = g.toggle; }
+    g.items.forEach(function (c) { S[c.id] = c.def; byId[c.id] = c; });
+  });
+
+  function fmtField(c, v) { return c.step < 1 ? v.toFixed(1) : Math.round(v).toLocaleString('en-AU'); }
+  function clamp(v, lo, hi) { return Math.min(hi, Math.max(lo, v)); }
+
+  function rowHTML(c) {
+    return '<div class="row" id="row-' + c.id + '">' +
+      '<label for="n-' + c.id + '">' + c.label + (c.pill ? '<span class="pill" id="pill-' + c.id + '"></span>' : '') + '</label>' +
+      '<span class="num">' + (c.pre ? '<span>' + c.pre + '</span>' : '') +
+      '<input id="n-' + c.id + '" type="text" inputmode="decimal" autocomplete="off" value="' + fmtField(c, c.def) + '">' +
+      (c.suf ? '<span>' + c.suf + '</span>' : '') + '</span>' +
+      '<input id="r-' + c.id + '" type="range" min="' + c.min + '" max="' + c.max + '" step="' + c.step + '" value="' + c.def + '" aria-label="' + c.label + '">' +
+      '</div>';
+  }
+  function toggleHTML(t) {
+    return '<label class="tog" id="trow-' + t.id + '"><input type="checkbox" id="tog-' + t.id + '"' + (t.def ? ' checked' : '') + '><span>' + t.label + '</span></label>' +
+      (t.hint ? '<p class="hint">' + t.hint + '</p>' : '');
+  }
+  $('controls').innerHTML = CTL.map(function (g) {
+    return '<div class="grp"><h3>' + g.grp + '</h3>' + (g.toggle ? toggleHTML(g.toggle) : '') + g.items.map(rowHTML).join('') + '</div>';
+  }).join('');
+
+  function setNumbers(id) {
+    var c = byId[id];
+    $('r-' + id).value = S[id];
+    $('n-' + id).value = fmtField(c, S[id]);
+  }
+
+  function syncCrashMax() {
+    var c = byId.crashYear;
+    c.max = S.years;
+    $('r-crashYear').max = S.years;
+    if (S.crashYear > S.years) { S.crashYear = S.years; setNumbers('crashYear'); }
+  }
+
+  function syncStopRange() {
+    var c = byId.stopAge, hi = S.age + S.years;
+    c.min = S.age; c.max = hi;
+    $('r-stopAge').min = S.age; $('r-stopAge').max = hi;
+    S.stopAge = S.stopAtEnd ? hi : clamp(S.stopAge, S.age, hi);
+    setNumbers('stopAge');
+  }
+  function afterChange(id) {
+    if (id === 'years') syncCrashMax();
+    if (id === 'years' || id === 'age') syncStopRange();
+    if (id === 'stopAge') S.stopAtEnd = S.stopAge >= S.age + S.years;
+  }
+
+  function syncEnabled() {
+    Object.keys(byId).forEach(function (id) {
+      var c = byId[id];
+      var on = !c.needs || c.needs.every(function (k) { return S[k]; });
+      $('row-' + id).classList.toggle('off', !on);
+      $('n-' + id).disabled = !on;
+      $('r-' + id).disabled = !on;
+    });
+    Object.keys(toggles).forEach(function (id) {
+      var t = toggles[id];
+      var on = !t.needs || t.needs.every(function (k) { return S[k]; });
+      $('trow-' + id).classList.toggle('off', !on);
+      $('tog-' + id).disabled = !on;
+    });
+  }
+
+  var queued = false;
+  function schedule() {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(function () { queued = false; render(); });
+  }
+
+  Object.keys(byId).forEach(function (id) {
+    var c = byId[id], r = $('r-' + id), n = $('n-' + id);
+    r.addEventListener('input', function () {
+      S[id] = Number(r.value);
+      n.value = fmtField(c, S[id]);
+      afterChange(id);
+      schedule();
+    });
+    n.addEventListener('input', function () {
+      var v = parseFloat(n.value.replace(/[^0-9.\-]/g, ''));
+      if (!isFinite(v)) return;
+      S[id] = clamp(v, c.min, c.max);
+      r.value = S[id];
+      afterChange(id);
+      schedule();
+    });
+    n.addEventListener('change', function () { setNumbers(id); });
+    n.addEventListener('keydown', function (e) { if (e.key === 'Enter') n.blur(); });
+  });
+  Object.keys(toggles).forEach(function (id) {
+    $('tog-' + id).addEventListener('change', function (e) { S[id] = e.target.checked; syncEnabled(); schedule(); });
+  });
+  $('reset').addEventListener('click', function () {
+    Object.keys(byId).forEach(function (id) { S[id] = byId[id].def; });
+    Object.keys(toggles).forEach(function (id) { S[id] = toggles[id].def; $('tog-' + id).checked = toggles[id].def; });
+    S.stopAtEnd = true;
+    byId.crashYear.max = 40;
+    Object.keys(byId).forEach(setNumbers);
+    syncStopRange();
+    syncCrashMax();
+    syncEnabled();
+    schedule();
+  });
+
+  /* ---------- formatting ---------- */
+  var AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', maximumFractionDigits: 0 });
+  function aud(v) { return AUD.format(Math.round(v) + 0).replace('-', '−'); }
+  function signed(v) { var r = Math.round(v) + 0; return (r < 0 ? '−' : '+') + AUD.format(Math.abs(r)); }
+  function short(v) {
+    var a = Math.abs(v);
+    if (a >= 1e6) return '$' + (v / 1e6).toFixed(a >= 1e7 ? 0 : 1).replace(/\.0$/, '') + 'M';
+    if (a >= 1e3) return '$' + Math.round(v / 1e3) + 'k';
+    return '$' + Math.round(v);
+  }
+
+  /* ---------- theme ---------- */
+  function cssVar(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+  function rgba(hex, a) {
+    var h = hex.replace('#', '');
+    if (h.length === 3) h = h.split('').map(function (x) { return x + x; }).join('');
+    var n = parseInt(h, 16);
+    return 'rgba(' + (n >> 16 & 255) + ',' + (n >> 8 & 255) + ',' + (n & 255) + ',' + a + ')';
+  }
+
+  /* ---------- charts ---------- */
+  var view = { crashYear: null, stopYear: null };
+  var SERIES = [
+    { label: 'Total net worth (optimized)', c: '--s1', dash: [], width: 2.75, cls: '', on: true },
+    { label: 'Standard DCA only (net worth)', c: '--s2', dash: [], width: 2.25, cls: '', on: true },
+    { label: 'Optimized portfolio', c: '--s3', dash: [7, 4], width: 2, cls: 'dash', on: true },
+    { label: 'Optimized HYSA cash', c: '--s4', dash: [2, 3], width: 2, cls: 'dot', on: false }
+  ];
+
+  var crosshair = {
+    id: 'crosshair',
+    afterDatasetsDraw: function (chart) {
+      var act = chart.tooltip && chart.tooltip.getActiveElements ? chart.tooltip.getActiveElements() : [];
+      if (!act.length) return;
+      var x = act[0].element.x, a = chart.chartArea, ctx = chart.ctx;
+      ctx.save();
+      ctx.strokeStyle = rgba(cssVar('--muted'), 0.55);
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(x, a.top); ctx.lineTo(x, a.bottom); ctx.stroke();
+      ctx.restore();
+    }
+  };
+  var crashMark = {
+    id: 'crashMark',
+    afterDatasetsDraw: function (chart) {
+      if (view.crashYear == null) return;
+      var xs = chart.scales.x, a = chart.chartArea, ctx = chart.ctx;
+      var x = xs.getPixelForValue(view.crashYear);
+      if (x < a.left || x > a.right) return;
+      var txt = 'Year ' + view.crashYear + ' crash';
+      ctx.save();
+      ctx.strokeStyle = cssVar('--ink');
+      ctx.lineWidth = 1.25;
+      ctx.setLineDash([5, 4]);
+      ctx.beginPath(); ctx.moveTo(x, a.top); ctx.lineTo(x, a.bottom); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = cssVar('--ink');
+      ctx.font = '500 12px ' + cssVar('--font-ui');
+      var w = ctx.measureText(txt).width;
+      if (x + 8 + w > a.right) { ctx.textAlign = 'right'; ctx.fillText(txt, x - 8, a.top + 14); }
+      else { ctx.textAlign = 'left'; ctx.fillText(txt, x + 8, a.top + 14); }
+      ctx.restore();
+    }
+  };
+
+  var stopMark = {
+    id: 'stopMark',
+    afterDatasetsDraw: function (chart) {
+      if (view.stopYear == null) return;
+      var xs = chart.scales.x, a = chart.chartArea, ctx = chart.ctx;
+      var x = xs.getPixelForValue(view.stopYear);
+      if (x < a.left || x > a.right) return;
+      var txt = (S.postDca > 0 ? 'DCA steps down at age ' : 'DCA stops at age ') + S.stopAge;
+      ctx.save();
+      ctx.strokeStyle = cssVar('--muted');
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([2, 3]);
+      ctx.beginPath(); ctx.moveTo(x, a.top); ctx.lineTo(x, a.bottom); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = cssVar('--muted');
+      ctx.font = '500 12px ' + cssVar('--font-ui');
+      var w = ctx.measureText(txt).width;
+      if (x + 8 + w > a.right) { ctx.textAlign = 'right'; ctx.fillText(txt, x - 8, a.top + 30); }
+      else { ctx.textAlign = 'left'; ctx.fillText(txt, x + 8, a.top + 30); }
+      ctx.restore();
+    }
+  };
+
+  var targetMark = {
+    id: 'targetMark',
+    afterDatasetsDraw: function (chart) {
+      if (chart.canvas.id !== 'main' || !(S.target > 0)) return;
+      var ys = chart.scales.y, a = chart.chartArea, ctx = chart.ctx;
+      var y = ys.getPixelForValue(S.target);
+      if (y < a.top || y > a.bottom) return;
+      ctx.save();
+      ctx.strokeStyle = cssVar('--ink');
+      ctx.lineWidth = 1.25;
+      ctx.setLineDash([8, 4, 2, 4]);
+      ctx.beginPath(); ctx.moveTo(a.left, y); ctx.lineTo(a.right, y); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = cssVar('--ink');
+      ctx.font = '500 12px ' + cssVar('--font-ui');
+      ctx.textAlign = 'left';
+      ctx.fillText('Target ' + short(S.target), a.left + 8, y - 6);
+      ctx.restore();
+    }
+  };
+
+  function axes(yTitle) {
+    return {
+      x: { type: 'linear', min: 0, max: 23,
+        title: { display: true, text: 'Time (Years)' },
+        ticks: { stepSize: 2, callback: function (v) { return Number.isInteger(v) ? v : ''; } },
+        grid: { color: '#ddd' }, border: { color: '#999' } },
+      y: { beginAtZero: true,
+        title: { display: true, text: yTitle },
+        ticks: { maxTicksLimit: 7, callback: function (v) { return short(v); } },
+        afterFit: function (s) { s.width = 70; },
+        grid: { color: '#ddd' }, border: { display: false } }
+    };
+  }
+  function tooltipOpts(titleFn) {
+    return {
+      mode: 'index', intersect: false, padding: 10, borderWidth: 1, boxPadding: 4, cornerRadius: 6,
+      titleFont: { family: cssVar('--font-ui'), weight: '600' },
+      bodyFont: { family: cssVar('--font-num'), size: 12 },
+      callbacks: {
+        title: function (items) { return titleFn(items[0].parsed.x); },
+        label: function (c) { return ' ' + c.dataset.label + ': ' + aud(c.parsed.y); },
+        labelColor: function (c) { return { borderColor: c.dataset.borderColor, backgroundColor: c.dataset.borderColor, borderWidth: 0, borderRadius: 2 }; }
+      }
+    };
+  }
+  function yearTitle(x) { var y = Math.round(x * PPY) / PPY; return 'Year ' + y.toFixed(2) + ' · age ' + (S.age + y).toFixed(1); }
+
+  var mainChart = new Chart($('main'), {
+    type: 'line',
+    data: { datasets: SERIES.map(function (s) {
+      return { label: s.label, data: [], borderDash: s.dash, borderWidth: s.width, hidden: !s.on,
+        pointRadius: 0, pointHoverRadius: 4, pointBorderWidth: 2, tension: 0 };
+    }) },
+    options: {
+      parsing: false, normalized: true, animation: false, responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false, axis: 'x' },
+      scales: axes('Total Capital ($ AUD)'),
+      plugins: { legend: { display: false }, tooltip: tooltipOpts(yearTitle) }
+    },
+    plugins: [crosshair, crashMark, stopMark, targetMark]
+  });
+
+  var alphaChart = new Chart($('alpha'), {
+    type: 'line',
+    data: { datasets: [{ label: 'Alpha', data: [], borderWidth: 2.25, fill: true, pointRadius: 0, pointHoverRadius: 4, pointBorderWidth: 2, tension: 0 }] },
+    options: {
+      parsing: false, normalized: true, animation: false, responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false, axis: 'x' },
+      scales: axes('Alpha ($ AUD)'),
+      plugins: { legend: { display: false }, tooltip: tooltipOpts(yearTitle) }
+    },
+    plugins: [crosshair, crashMark, stopMark, targetMark]
+  });
+  alphaChart.options.scales.x.title.display = false;
+
+  function applyTheme() {
+    var ink = cssVar('--ink'), muted = cssVar('--muted'), grid = cssVar('--grid'), line = cssVar('--line'), surf = cssVar('--surface');
+    [mainChart, alphaChart].forEach(function (ch) {
+      ['x', 'y'].forEach(function (k) {
+        var sc = ch.options.scales[k];
+        sc.ticks.color = muted;
+        sc.title.color = muted;
+        sc.grid.color = grid;
+        if (k === 'x') sc.border.color = line;
+      });
+      var t = ch.options.plugins.tooltip;
+      t.backgroundColor = surf; t.titleColor = ink; t.bodyColor = ink; t.borderColor = line;
+      Chart.defaults.font.family = cssVar('--font-ui');
+    });
+    SERIES.forEach(function (s, i) {
+      var col = cssVar(s.c), ds = mainChart.data.datasets[i];
+      ds.borderColor = col; ds.backgroundColor = col; ds.pointHoverBackgroundColor = col; ds.pointHoverBorderColor = surf;
+    });
+    var a = alphaChart.data.datasets[0], c1 = cssVar('--s1');
+    a.borderColor = c1; a.backgroundColor = rgba(c1, 0.14); a.pointHoverBackgroundColor = c1; a.pointHoverBorderColor = surf;
+    mainChart.update('none'); alphaChart.update('none');
+    SERIES.forEach(function (s, i) { var el = $('lg-' + i); if (el) el.style.setProperty('--c', cssVar(s.c)); });
+  }
+  new MutationObserver(applyTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  if (window.matchMedia) {
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    if (mq.addEventListener) mq.addEventListener('change', applyTheme);
+  }
+
+  $('legend').innerHTML = SERIES.map(function (s, i) {
+    return '<button type="button" class="lg" id="lg-' + i + '" aria-pressed="' + s.on + '"><i class="' + s.cls + '"></i>' + s.label + '</button>';
+  }).join('');
+  SERIES.forEach(function (s, i) {
+    $('lg-' + i).addEventListener('click', function () {
+      s.on = !s.on;
+      $('lg-' + i).setAttribute('aria-pressed', String(s.on));
+      mainChart.setDatasetVisibility(i, s.on);
+      mainChart.update('none');
+    });
+  });
+
+  /* ---------- render ---------- */
+  function sumRange(a, r, y0, y1) {
+    var t = 0;
+    for (var y = y0; y < y1; y++) t += a * Math.pow(1 + r / 100, y) * PPY;
+    return t;
+  }
+
+  function coast() {
+    var hi = S.age + S.years, best = null, full = null;
+    for (var a = S.age; a <= hi; a++) {
+      var o = simulate(Object.assign({}, S, { stopAge: a }), true);
+      var nw = (o.port[o.N] + o.hy[o.N]) / (S.realOn ? Math.pow(1 + S.infl / 100, S.years) : 1);
+      if (a === hi) full = nw;
+      if (best === null && nw >= S.target) best = { age: a, nw: nw };
+    }
+    return { best: best, full: full };
+  }
+
+  function mk(N, f) {
+    var a = new Array(N + 1);
+    for (var i = 0; i <= N; i++) a[i] = { x: i / PPY, y: f(i) };
+    return a;
+  }
+
+  function render() {
+    var std = simulate(S, false), opt = simulate(S, true), N = opt.N, Y = S.years;
+    var Dend = S.realOn ? Math.pow(1 + S.infl / 100, Y) : 1;
+    if (S.realOn) {
+      var deflBase = 1 + S.infl / 100;
+      [std.port, std.hy, opt.port, opt.hy].forEach(function (a) { for (var k = 0; k <= N; k++) a[k] /= Math.pow(deflBase, k / PPY); });
+    }
+    mainChart.options.scales.y.title.text = S.realOn ? "Total Capital (today's $ AUD)" : 'Total Capital ($ AUD)';
+    alphaChart.options.scales.y.title.text = S.realOn ? "Alpha (today's $ AUD)" : 'Alpha ($ AUD)';
+    $('tbl-sum').textContent = S.realOn ? "Year-by-year table (today's dollars)" : 'Year-by-year table';
+    function nwO(i) { return opt.port[i] + opt.hy[i]; }
+    function nwS(i) { return std.port[i] + std.hy[i]; }
+
+    mainChart.data.datasets[0].data = mk(N, nwO);
+    mainChart.data.datasets[1].data = mk(N, nwS);
+    mainChart.data.datasets[2].data = mk(N, function (i) { return opt.port[i]; });
+    mainChart.data.datasets[3].data = mk(N, function (i) { return opt.hy[i]; });
+    alphaChart.data.datasets[0].data = mk(N, function (i) { return nwO(i) - nwS(i); });
+    var step = Y <= 10 ? 1 : Y <= 24 ? 2 : 5;
+    [mainChart, alphaChart].forEach(function (ch) {
+      ch.options.scales.x.max = Y;
+      ch.options.scales.x.ticks.stepSize = step;
+    });
+    view.crashYear = S.crashOn ? S.crashYear : null;
+    view.stopYear = (S.stopAge > S.age && S.stopAge < S.age + Y) ? S.stopAge - S.age : null;
+    mainChart.options.scales.y.suggestedMax = S.target * 1.06;
+    mainChart.update('none'); alphaChart.update('none');
+
+    var endNW = nwO(N), stdNW = nwS(N), alpha = endNW - stdNW;
+    var principal = Math.max(0, S.hysa0 - opt.deployed) / Dend;
+    $('atyear').textContent = 'At the end of year ' + Y + (S.realOn ? ", in today's dollars" : '');
+    $('c-nw').textContent = aud(endNW);
+    $('c-nw-n').textContent = 'Standard DCA: ' + aud(stdNW);
+    $('c-port').textContent = aud(opt.port[N]);
+    $('c-port-n').textContent = signed(opt.port[N] - std.port[N]) + ' vs standard portfolio';
+    $('c-hysa').textContent = aud(opt.hy[N]);
+    $('c-hysa-n').textContent = aud(principal) + ' principal, ' + aud(Math.max(0, opt.hy[N] - principal)) + ' interest';
+    $('c-alpha').textContent = signed(alpha);
+    $('c-alpha-n').textContent = stdNW > 0 ? (alpha >= 0 ? '+' : '−') + Math.abs(alpha / stdNW * 100).toFixed(1) + '% on the standard path' : '';
+
+    var msg;
+    if (!S.crashOn) {
+      msg = 'Crash scenario is off, so the optimized path matches the standard path.';
+    } else if (opt.fired === 0) {
+      msg = '<strong>Year ' + S.crashYear + ':</strong> a −' + S.depth + '% drawdown does not reach the first tier (−20%), so no cash is deployed.';
+    } else {
+      msg = '<strong>Year ' + S.crashYear + ':</strong> a −' + S.depth + '% drawdown triggers ' + opt.fired + ' of 3 tiers. ' +
+        aud(opt.deployed) + ' moves from the HYSA into equities, leaving ' + aud(opt.hysaAfter) + ' in the HYSA.';
+      if (S.priceOn) msg += ' Prices fall ' + S.depth + '% and recover over ' + S.recovery + (S.recovery === 1 ? ' year.' : ' years.');
+    }
+    var yrs = Math.max(0, Math.min(S.stopAge - S.age, Y));
+    var paid = sumRange(S.dca, S.raise, 0, yrs) + sumRange(S.postDca, S.raise, yrs, Y);
+    var rtxt = S.raise > 0 ? ', raised ' + S.raise + '% each year' : '';
+    var dmsg = S.stopAge >= S.age + Y
+      ? 'DCA of ' + aud(S.dca) + ' per fortnight' + rtxt + ' runs all ' + Y + ' years, ' + aud(paid) + ' contributed in total.'
+      : 'DCA is ' + aud(S.dca) + ' per fortnight' + rtxt + ' until age ' + S.stopAge + ' (year ' + yrs + '), then ' +
+        (S.postDca > 0 ? aud(S.postDca) + ' per fortnight' : 'nothing') + '. ' + aud(paid) + ' contributed in total.';
+    var realNote = "Charts, cards and the table show today's dollars at " + S.infl + '% inflation a year. Dollar amounts in this status line are as paid at the time.';
+    $('status').innerHTML = msg + '<br>' + dmsg + (S.realOn ? '<br>' + realNote : '');
+
+    var cs = coast(), tg = S.target, endAge = S.age + Y, gap = endNW - tg, tnote;
+    $('tgt-k').textContent = 'Target ' + aud(tg) + (S.realOn ? " in today's dollars" : '') + ' by age ' + endAge;
+    var nowTxt = 'Your current ' + (S.postDca > 0 ? 'step-down' : 'stop') + ' age (' + S.stopAge + ') finishes at ' + aud(endNW) + ', ' + (gap >= 0 ? aud(gap) + ' above' : aud(-gap) + ' below') + ' the target.';
+    if (!cs.best) {
+      $('tgt-v').textContent = 'Out of reach';
+      tnote = 'Even with DCA every year you finish at ' + aud(cs.full) + ', ' + aud(tg - cs.full) + ' short. Raise the return, the DCA or the horizon.';
+    } else if (cs.best.age === S.age) {
+      $('tgt-v').textContent = (S.postDca > 0 ? 'Step down now' : 'No more DCA needed');
+      tnote = 'What you hold now already grows past the target, finishing at ' + aud(cs.best.nw) + '. ' + nowTxt;
+    } else {
+      $('tgt-v').textContent = (S.postDca > 0 ? 'Step down at age ' : 'Stop DCA at age ') + cs.best.age;
+      tnote = '<strong>Earliest ' + (S.postDca > 0 ? 'step-down' : 'stop') + ' age that still reaches it</strong> (year ' + (cs.best.age - S.age) + '), finishing at ' + aud(cs.best.nw) + '. ' + nowTxt +
+        (S.stopAge > cs.best.age ? ' ' + (S.postDca > 0 ? 'Stepping down' : 'Stopping') + ' at ' + cs.best.age + ' frees up ' + aud(sumRange(S.dca - S.postDca, S.raise, cs.best.age - S.age, S.stopAge - S.age)) + ' of contributions' + (S.realOn ? ' as paid' : '') + '.' : '');
+    }
+    $('tgt-note').innerHTML = tnote;
+
+    [['t1', 20], ['t2', 30], ['t3', 40]].forEach(function (p) {
+      var el = $('pill-' + p[0]), hit = S.crashOn && S.depth >= p[1];
+      el.textContent = S.crashOn ? (hit ? 'triggered' : 'not reached') : '';
+      el.classList.toggle('hit', hit);
+    });
+
+    $('pill-stopAge').textContent = S.stopAge >= S.age + Y ? 'runs to the end' : 'year ' + (S.stopAge - S.age);
+    var rows = [];
+    for (var y = 0; y <= Y; y++) {
+      var i = y * PPY;
+      rows.push('<tr' + (S.crashOn && y === S.crashYear ? ' class="crash"' : '') + '><td>' + y + '</td><td>' + (S.age + y) + '</td><td>' + aud(nwS(i)) + '</td><td>' + aud(opt.port[i]) +
+        '</td><td>' + aud(opt.hy[i]) + '</td><td>' + aud(nwO(i)) + '</td><td>' + signed(nwO(i) - nwS(i)) + '</td></tr>');
+    }
+    $('tbody').innerHTML = rows.join('');
+
+    $('main').setAttribute('aria-label', 'Line chart of total capital over ' + Y + ' years. Optimized net worth ends at ' + aud(endNW) + ' against ' + aud(stdNW) + ' for standard DCA.');
+    $('alpha').setAttribute('aria-label', 'Line chart of alpha over ' + Y + ' years, ending at ' + signed(alpha) + '.');
+  }
+
+  syncCrashMax();
+  syncEnabled();
+  syncStopRange();
+  applyTheme();
+  render();
+})();
+</script>
+
+</body></html>
