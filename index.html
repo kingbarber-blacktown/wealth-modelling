@@ -101,12 +101,71 @@ body::before{animation:glow-breathe 18s ease-in-out infinite}
 @media(max-width:560px){.ai-copilot{padding:14px}.ai-status{width:100%;margin-left:46px;text-align:left}.ai-actions{align-items:stretch}.ai-send{width:100%}}
 @media(prefers-reduced-motion:reduce){.ai-chip{transition:none}}
 
+
+/* Zero-start model controls and floating, resizable Wealth Copilot */
+.panelhead{gap:8px;flex-wrap:wrap}
+.panel-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+#randomize,#reset{font:600 11.5px var(--font-ui);border:1px solid var(--line);border-radius:999px;padding:7px 10px;cursor:pointer;white-space:nowrap}
+#randomize{background:var(--s1);border-color:var(--s1);color:#fff}
+#randomize:hover{filter:brightness(.96)}
+#reset{background:transparent;color:var(--ink)}
+#reset:hover{background:var(--hl);border-color:var(--s1)}
+.ai-launcher{position:fixed;right:22px;bottom:22px;z-index:10001;display:flex;align-items:center;gap:10px;border:1px solid color-mix(in srgb,var(--s1) 35%,transparent);border-radius:999px;padding:13px 17px;background:var(--s1);color:#fff;box-shadow:0 12px 34px rgba(18,35,69,.25);font:650 13px var(--font-ui);cursor:pointer;transition:transform .18s,box-shadow .18s}
+.ai-launcher:hover{transform:translateY(-2px);box-shadow:0 16px 38px rgba(18,35,69,.3)}
+.ai-launcher-spark{font-size:18px;line-height:1}
+.ai-launcher-dot{width:7px;height:7px;border-radius:50%;background:#7af0c0;box-shadow:0 0 0 3px rgba(122,240,192,.18)}
+.ai-chat-window{position:fixed;z-index:10000;right:22px;bottom:84px;width:min(440px,calc(100vw - 24px));height:min(690px,calc(100dvh - 106px));min-height:300px;display:none;flex-direction:column;gap:0;padding:0;overflow:hidden;background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:0 22px 70px rgba(6,15,32,.28)}
+.ai-chat-window.is-open{display:flex}
+.ai-chat-window.is-wide{width:min(720px,calc(100vw - 24px));height:min(780px,calc(100dvh - 106px))}
+.ai-chat-window.is-fullscreen{inset:12px;width:auto;height:auto;max-height:none;border-radius:18px}
+.ai-chat-header{display:flex;align-items:center;gap:8px;padding:13px 14px;border-bottom:1px solid var(--line);background:var(--surface);flex:none}
+.ai-chat-header .ai-head{min-width:0;flex:1;gap:9px}
+.ai-chat-header .ai-mark{width:34px;height:34px}
+.ai-heading-copy{min-width:0}
+.ai-chat-header .ai-title{font-size:14px}
+.ai-chat-header .ai-subtitle{font-size:11px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ai-chat-header .ai-status{margin:0;font-size:10px;white-space:nowrap}
+.ai-chat-tools{display:flex;gap:4px;align-items:center;flex:none}
+.ai-window-btn{display:grid;place-items:center;width:30px;height:30px;border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--ink);font:600 17px/1 var(--font-ui);cursor:pointer}
+.ai-window-btn:hover{background:var(--hl);border-color:var(--s1)}
+.ai-close-btn{font-size:22px}
+.ai-chat-body{display:flex;flex-direction:column;gap:10px;min-height:0;flex:1;padding:11px}
+.ai-chat-body .ai-prompts{flex:none;max-height:67px;overflow:auto;align-content:flex-start;gap:5px}
+.ai-chat-body .ai-chip{font-size:10.5px;padding:5px 8px}
+.ai-answer{display:flex;flex-direction:column;gap:9px;flex:1;min-height:90px;overflow:auto;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--bg);white-space:normal;overflow-wrap:anywhere;scroll-behavior:smooth}
+.ai-answer:empty{display:flex}
+.ai-message{max-width:94%;align-self:flex-start;border:1px solid var(--line);border-radius:13px 13px 13px 4px;padding:10px 12px;background:var(--surface);color:var(--ink);font-size:12.5px;line-height:1.58;white-space:pre-wrap;overflow-wrap:anywhere}
+.ai-message.user{align-self:flex-end;border-color:transparent;border-radius:13px 13px 4px 13px;background:var(--s1);color:#fff}
+.ai-message.ai-error{border-color:#e6a397;color:#a63a26;background:color-mix(in srgb,#fbe9e5 65%,var(--surface))}
+.ai-chat-body .ai-question{min-height:66px;max-height:160px;resize:vertical;font-size:12.5px;padding:10px 11px}
+.ai-chat-body .ai-actions{flex:none;gap:8px}
+.ai-chat-body .ai-send{min-width:112px;padding:9px 13px}
+.ai-chat-body #ai-usage{font-size:10.5px}
+.ai-chat-body .ai-footnote{font-size:9.5px;line-height:1.35;max-height:42px;overflow:auto}
+.ai-chat-window .ai-error{color:#a63a26}
+@media(max-width:560px){
+ .ai-launcher{right:12px;bottom:12px;padding:12px 14px}
+ .ai-chat-window{left:10px;right:10px;bottom:72px;width:auto;height:min(690px,calc(100dvh - 84px));max-height:calc(100dvh - 84px)}
+ .ai-chat-window.is-wide{left:10px;right:10px;width:auto;height:min(760px,calc(100dvh - 84px))}
+ .ai-chat-window.is-fullscreen{inset:7px;width:auto;height:auto;max-height:none}
+ .ai-chat-header{gap:5px;padding:10px}
+ .ai-chat-header .ai-subtitle{display:none}
+ .ai-chat-header .ai-status{display:none}
+ .ai-window-btn{width:28px;height:28px}
+ .ai-chat-body{padding:9px;gap:8px}
+ .ai-chat-body .ai-prompts{max-height:58px}
+ .ai-chat-body .ai-footnote{max-height:32px}
+ .panelhead{align-items:flex-start}
+ .panel-actions{margin-left:auto}
+}
+@media(prefers-reduced-motion:reduce){.ai-launcher{transition:none}.ai-answer{scroll-behavior:auto}}
+
 </style>
 </head>
 <body>
 <div class="wrap"><div class="app">
 <aside class="panel" aria-label="Model parameters">
-  <div class="panelhead"><h2>Parameters</h2><button id="reset" type="button">Reset</button></div>
+  <div class="panelhead"><h2>Parameters</h2><div class="panel-actions"><button id="randomize" type="button">Randomise all</button><button id="reset" type="button">Zero all</button></div></div>
   <div class="fundpick">
     <label for="fundPreset">Underlying index preset</label>
     <select id="fundPreset" aria-describedby="presetInfo">
@@ -147,23 +206,40 @@ body::before{animation:glow-breathe 18s ease-in-out infinite}
   <section class="box" aria-labelledby="h-alpha"><div class="chart-heading"><h2 id="h-alpha">Cash deployment vs standard DCA</h2><span class="info-wrap chart-info"><button class="info-btn" type="button" aria-label="Explain cash deployment comparison graph" aria-describedby="help-chart-alpha" aria-expanded="false">i</button><span class="tip" id="help-chart-alpha" role="tooltip">Shows the median difference in after-tax net worth between the cash-deployment strategy and standard dollar-cost averaging (DCA) using matched simulated return paths. Positive values favour the cash-deployment strategy; negative values favour standard DCA. It is a comparison under your assumptions, not proof that timing the market will outperform.</span></span></div><div class="cbox sm"><canvas id="alpha" role="img" aria-label="Median difference between optimized cash deployment and standard DCA"></canvas></div></section>
   <section class="box"><details><summary id="tbl-sum">Year-by-year table</summary><div class="tablewrap"><table><thead><tr><th>Year</th><th>Age</th><th>Standard DCA<br>(after CGT)</th><th>Optimized portfolio<br>(pre-CGT)</th><th>Optimized HYSA<br>(after tax)</th><th>Estimated CGT<br>on sale</th><th>Optimized net worth<br>(after CGT)</th><th>Alpha</th><th>10th–90th percentile<br>net worth range</th></tr></thead><tbody id="tbody"></tbody></table></div></details></section>
 
-<section class="ai-copilot" aria-labelledby="ai-title">
-  <div class="ai-head">
-    <div class="ai-mark" aria-hidden="true">✦</div>
-    <div><h2 class="ai-title" id="ai-title">AI Wealth Copilot</h2><p class="ai-subtitle">Ask questions about the numbers in your current simulation.</p></div>
-    <div class="ai-status" id="ai-status" aria-live="polite">Not connected yet</div>
+<!-- Floating Wealth Copilot launcher and chat window -->
+<button id="ai-launcher" class="ai-launcher" type="button" aria-controls="ai-chat-window" aria-expanded="false">
+  <span class="ai-launcher-spark" aria-hidden="true">✦</span>
+  <span>Wealth Copilot</span>
+  <span class="ai-launcher-dot" aria-hidden="true"></span>
+</button>
+<section class="ai-copilot ai-chat-window" id="ai-chat-window" aria-labelledby="ai-title" aria-hidden="true">
+  <div class="ai-chat-header">
+    <div class="ai-head">
+      <div class="ai-mark" aria-hidden="true">✦</div>
+      <div class="ai-heading-copy"><h2 class="ai-title" id="ai-title">AI Wealth Copilot</h2><p class="ai-subtitle">Ask about your current simulation.</p></div>
+    </div>
+    <div class="ai-chat-tools">
+      <button type="button" class="ai-window-btn" id="ai-size-toggle" aria-label="Widen chat" title="Widen chat">↔</button>
+      <button type="button" class="ai-window-btn" id="ai-fullscreen" aria-label="Open full screen" title="Open full screen">⛶</button>
+      <button type="button" class="ai-window-btn ai-close-btn" id="ai-close" aria-label="Close chat" title="Close chat">×</button>
+    </div>
+    <div class="ai-status" id="ai-status" aria-live="polite">Ready</div>
   </div>
-  <div class="ai-prompts" aria-label="Suggested questions">
-    <button type="button" class="ai-chip" data-ai-prompt="Explain the main drivers of my projected wealth and the biggest uncertainties.">Explain my results</button>
-    <button type="button" class="ai-chip" data-ai-prompt="Compare my selected cash-deployment strategy with standard DCA. Explain the limitations and avoid assuming market timing will work.">Compare strategies</button>
-    <button type="button" class="ai-chip" data-ai-prompt="Review my current assumptions for realism. Identify optimistic assumptions, omitted costs, inflation effects, and key risks.">Check assumptions</button>
-    <button type="button" class="ai-chip" data-ai-prompt="Suggest a few what-if scenarios that could help me test my target, but do not change any settings automatically.">Explore what-ifs</button>
+  <div class="ai-chat-body">
+    <div class="ai-prompts" aria-label="Suggested questions">
+      <button type="button" class="ai-chip" data-ai-prompt="Explain the main drivers of my projected wealth and the biggest uncertainties.">Explain my results</button>
+      <button type="button" class="ai-chip" data-ai-prompt="Compare my selected cash-deployment strategy with standard DCA. Explain the limitations and avoid assuming market timing will work.">Compare strategies</button>
+      <button type="button" class="ai-chip" data-ai-prompt="Review my current assumptions for realism. Identify optimistic assumptions, omitted costs, inflation effects, and key risks.">Check assumptions</button>
+      <button type="button" class="ai-chip" data-ai-prompt="Suggest a few what-if scenarios that could help me test my target, but do not change any settings automatically.">Explore what-ifs</button>
+    </div>
+    <div id="ai-answer" class="ai-answer" role="log" aria-live="polite" aria-relevant="additions text" aria-label="Conversation">
+      <div class="ai-message assistant">Hi! I'm Wealth Copilot. Ask me about the assumptions, risks or results in your current simulation.</div>
+    </div>
+    <label for="ai-question" class="smallprint"><strong>Your message</strong></label>
+    <textarea id="ai-question" class="ai-question" maxlength="1600" placeholder="Ask about your current wealth projection… (Enter to send, Shift+Enter for a new line)" autocomplete="off"></textarea>
+    <div class="ai-actions"><button type="button" id="ai-send" class="ai-send">Send message</button><span class="smallprint" id="ai-usage">The simulator remains responsible for calculations.</span></div>
+    <p class="ai-footnote">Your question and a summary of your current settings/results are sent to Google Gemini via the Vercel backend. Avoid including identifying information. Check Google's current Gemini API terms before submitting sensitive data. AI output can be wrong and is not personal financial or tax advice.</p>
   </div>
-  <label for="ai-question" class="smallprint"><strong>Your question</strong></label>
-  <textarea id="ai-question" class="ai-question" maxlength="1600" placeholder="For example: What changes most improve my chance of reaching my target?" autocomplete="off"></textarea>
-  <div class="ai-actions"><button type="button" id="ai-send" class="ai-send">Ask Wealth Copilot</button><span class="smallprint" id="ai-usage">The AI explains scenarios; the simulator remains responsible for calculations.</span></div>
-  <div id="ai-answer" class="ai-answer" aria-live="polite" aria-atomic="true"></div>
-  <p class="ai-footnote">Privacy: submitting a question sends the question and a summary of your current model settings/results to Google Gemini via a separate backend. Avoid including identifying information. On Google's free API tier, submitted content may be used to improve Google products; check the current Gemini API terms before using sensitive data. AI output can be wrong and is not personal financial or tax advice.</p>
 </section>
 
   <div class="notes" id="notes">
@@ -188,7 +264,7 @@ var PRESETS={
  msciem:{name:'MSCI Emerging Markets Index',ret:10.36,vol:17.30,fxDrift:.20,fxVol:10,mer:.09,dy:2.20,foreign:100,whtIncluded:false,asof:'31 December 1987–30 April 2026 (USD gross return)',returnSource:'10.36% annualised gross total return in USD since 31 December 1987 from MSCI factsheet data; the model adds a separate editable approximate AUD FX drift and volatility component',url:'https://www.msci.com/documents/10199/536c9f92-3f0c-475c-a349-469770dfa529',volSource:'17.30% is a rounded long-run/available volatility proxy; recent official MSCI factsheets report 10-year volatility separately, so this should not be read as since-inception volatility',volUrl:'https://www.msci.com/documents/10199/255599/msci-emerging-markets-index-usd-price.pdf',fund:'iShares Core MSCI Emerging Markets ETF (US-listed IEMG; used only for management fee/distribution proxy)',fundAsOf:'30 September 2026',fundInfo:'0.09% expense ratio; 2.20% trailing 12-month distribution yield from the representative fund factsheet',fundUrl:'https://www.ishares.com/us/products/244050/ishares-core-msci-emerging-markets-etf'},
  mscijp:{name:'MSCI Japan Index',ret:2.94,vol:9.61,fxDrift:0,fxVol:0,mer:.49,dy:3.66,foreign:100,whtIncluded:true,asof:'31 May 1994–30 April 2026 (AUD net return)',returnSource:'2.94% annualised net total return in AUD since 31 May 1994 from the MSCI Japan AUD factsheet; the published series is net of index-level withholding assumptions',url:'https://www.msci.com/documents/10199/980b98b1-bff2-4eac-ad25-7613558c29e2',volSource:'9.61% annualised standard deviation over the 10-year period to 30 April 2026; this volatility window is shorter than the return history',volUrl:'https://www.msci.com/documents/10199/980b98b1-bff2-4eac-ad25-7613558c29e2',fund:'iShares MSCI Japan ETF (US-listed EWJ; used only for management fee/distribution proxy)',fundAsOf:'31 August 2026',fundInfo:'0.49% expense ratio; 3.66% trailing 12-month distribution yield from the representative fund factsheet',fundUrl:'https://www.ishares.com/us/products/239665/ishares-msci-japan-etf'}
 };
-var INITIAL={age:21,port0:44378,basis0:44378,hysa0:43000,dca:1600,raise:0,stopAge:44,postDca:0,eq:14.8,vol:25.83,fxDrift:.15,fxVol:10,divYield:.42,years:23,hy:5.9,mer:.18,brokerage:0,taxRate:32,foreignPct:100,wht:15,cgtDiscount:50,infl:2.5,target:4000000,realOn:false,crashOn:true,crashYear:3,depth:40,t1:5000,t2:7000,t3:10000,priceOn:false,recovery:2,preset:'ndx',stopAtEnd:true,whtIncluded:false};
+var INITIAL={age:0,port0:0,basis0:0,hysa0:0,dca:0,raise:0,stopAge:0,postDca:0,eq:0,vol:0,fxDrift:0,fxVol:0,divYield:0,years:0,hy:0,mer:0,brokerage:0,taxRate:0,foreignPct:0,wht:0,cgtDiscount:0,infl:0,target:0,realOn:false,crashOn:false,crashYear:0,depth:0,t1:0,t2:0,t3:0,priceOn:false,recovery:0,preset:'custom',stopAtEnd:false,whtIncluded:false};
 var S=Object.assign({},INITIAL), byId={}, toggles={};
 var CTL=[
  {grp:'Starting position',items:[
@@ -230,6 +306,13 @@ var CTL=[
   {id:'recovery',label:'Recovery time',min:1,max:6,step:1,def:2,suf:'yrs',needs:['crashOn','priceOn']}]}
 ];
 CTL.forEach(function(g){if(g.toggle){S[g.toggle.id]=g.toggle.def;toggles[g.toggle.id]=g.toggle;}g.items.forEach(function(c){S[c.id]=c.def;byId[c.id]=c;});});
+// Start with neutral zero values while retaining each control's original bounds for Randomise.
+INITIAL.preset='custom';INITIAL.basis0=0;INITIAL.stopAtEnd=false;
+CTL.forEach(function(g){
+  if(g.toggle){g.toggle.def=false;S[g.toggle.id]=false;}
+  g.items.forEach(function(c){c.randomMin=c.min;c.randomMax=c.max;c.min=Math.min(c.min,0);c.def=0;S[c.id]=0;});
+});
+S.preset='custom';S.basis0=0;S.stopAtEnd=false;
 var HELP={"age":"Your current age. The model adds each projection year to this starting age.","port0":"The current market value of your investment portfolio, in Australian dollars.","hysa0":"Cash currently held in your high-interest savings account (HYSA), available for future investment or kept as cash.","dca":"The amount invested from new savings every fortnight during the full-DCA period.","raise":"The annual percentage increase applied to your scheduled fortnightly contributions. This is a nominal annual step-up, not an investment return.","stopAge":"The age at which the main fortnightly contribution changes from the full-DCA amount to the after-that-age amount.","postDca":"The fortnightly contribution used after the selected full-DCA stopping age. Set to $0 to stop adding new money.","eq":"The selected index’s since-inception annualised return (or earliest long-run published period where necessary). Start dates, currencies and gross/net treatment differ by index; it is a historical reference, not a forecast.","vol":"The annual standard deviation of the selected index return series, before any FX volatility add-on. Higher volatility produces a wider range of outcomes.","fxDrift":"An approximate annualised currency adjustment added to the index CAGR to represent the long-run change in the value of USD assets when measured in AUD. Defaults are estimates, not an exact AUD historical backtest; set to zero to ignore FX drift.","fxVol":"An extra annual volatility component for currency movements. The model combines it with index volatility assuming zero correlation; real equity and FX returns can be correlated, so this is only an approximation. Set to zero for AUD-denominated index presets.","divYield":"The representative fund’s trailing 12-month distribution yield. The model spreads it through the year and estimates tax on the distributions; future payouts may differ.","years":"How many years to project from your current age. Cash flows are simulated fortnightly; chart and summary checkpoints are annual for speed.","hy":"The gross annual interest rate on cash savings, before the model’s simplified marginal-tax deduction.","infl":"The annual inflation assumption used to convert projected amounts and the target into today’s purchasing power when that option is enabled.","target":"The net-worth goal used to calculate the percentage of simulated outcomes that reach or exceed it by the end of the horizon.","mer":"The annual fund expense ratio (management and operating costs) from a representative fund that tracks the selected index. A pure index itself has no fund fee; this is a proxy-fund input.","brokerage":"The brokerage cost charged for each contribution/purchase. It is deducted from each invested amount in the simplified model.","taxRate":"Your assumed marginal tax rate including Medicare levy. Real tax depends on taxable income, offsets and personal circumstances.","foreignPct":"The estimated share of portfolio distributions arising from foreign investments. This changes the model’s simplified tax treatment of distributions.","wht":"The foreign withholding-tax rate used in the simplified distribution-tax estimate. Actual tax and foreign income tax offsets depend on the fund structure and your circumstances.","cgtDiscount":"The discount applied to estimated taxable capital gains at sale. The model uses the same discount for all gains and does not assess parcel-by-parcel eligibility.","crashYear":"The projection year in which the configured drawdown event and cash-deployment tiers are checked.","depth":"The simulated peak-to-trough fall for the crash event. A cash tier activates when this drawdown equals or exceeds its own trigger threshold.","t1Depth":"The fall in the market needed to activate Tier 1. You can choose any threshold from 0% to 60%; it is no longer locked at 20%.","t1":"The maximum cash amount allocated to Tier 1 when the market drawdown meets or exceeds its trigger.","t2Depth":"The fall in the market needed to activate Tier 2. You can choose any threshold from 0% to 60%; it is no longer locked at 30%.","t2":"The maximum cash amount allocated to Tier 2 when the market drawdown meets or exceeds its trigger.","t3Depth":"The fall in the market needed to activate Tier 3. You can choose any threshold from 0% to 60%; it is no longer locked at 40%.","t3":"The maximum cash amount allocated to Tier 3 when the market drawdown meets or exceeds its trigger.","recovery":"The number of years over which a simulated share-price drawdown linearly recovers towards its undisturbed trend when price-drawdown mode is switched on."};
 function fmtField(c,v){var decimals=(String(c.step).split('.')[1]||'').length;var n=Number(v);return n.toLocaleString('en-AU',{minimumFractionDigits:decimals,maximumFractionDigits:decimals});}
 function clamp(v,lo,hi){return Math.min(hi,Math.max(lo,v));}
@@ -249,7 +332,33 @@ function syncEnabled(){Object.keys(byId).forEach(function(id){var c=byId[id],on=
 var queued=false,renderTimer=0;function schedule(immediate){if(renderTimer){clearTimeout(renderTimer);renderTimer=0;}function run(){if(queued)return;queued=true;requestAnimationFrame(function(){queued=false;render();});}if(immediate){run();return;}/* Debounce expensive Monte Carlo work while a range input is being dragged. */renderTimer=setTimeout(function(){renderTimer=0;run();},95);}
 Object.keys(byId).forEach(function(id){var c=byId[id],r=$('r-'+id),n=$('n-'+id);r.addEventListener('input',function(){S[id]=Number(r.value);if(id==='port0')S.basis0=S.port0;n.value=fmtField(c,S[id]);afterChange(id);syncEnabled();schedule();});n.addEventListener('input',function(){var v=parseFloat(n.value.replace(/[^0-9.\-]/g,''));if(!isFinite(v))return;S[id]=clamp(v,c.min,c.max);if(id==='port0')S.basis0=S.port0;r.value=S[id];afterChange(id);syncEnabled();schedule();});n.addEventListener('change',function(){S[id]=clamp(Number(S[id]),c.min,c.max);setNumbers(id);schedule(true);});r.addEventListener('change',function(){schedule(true);});n.addEventListener('keydown',function(e){if(e.key==='Enter')n.blur();});});
 Object.keys(toggles).forEach(function(id){$('tog-'+id).addEventListener('change',function(e){S[id]=e.target.checked;if(id==='whtIncluded')updatePresetInfo();syncEnabled();schedule();});});
-$('reset').addEventListener('click',function(){S=Object.assign({},INITIAL);CTL.forEach(function(g){if(g.toggle){S[g.toggle.id]=g.toggle.def;$('tog-'+g.toggle.id).checked=g.toggle.def;}g.items.forEach(function(c){S[c.id]=c.def;});});S.preset=INITIAL.preset;Object.keys(byId).forEach(setNumbers);$('fundPreset').value=S.preset;syncCrashMax();syncStopRange();syncEnabled();updatePresetInfo();schedule();});
+function zeroAllInputs(){
+  S=Object.assign({},INITIAL);
+  CTL.forEach(function(g){
+    if(g.toggle){S[g.toggle.id]=false;$('tog-'+g.toggle.id).checked=false;}
+    g.items.forEach(function(c){S[c.id]=0;});
+  });
+  S.preset='custom';S.basis0=0;S.stopAtEnd=false;
+  $('fundPreset').value='custom';
+  syncCrashMax();syncStopRange();Object.keys(byId).forEach(setNumbers);syncEnabled();updatePresetInfo();schedule(true);
+}
+$('reset').addEventListener('click',zeroAllInputs);
+function randomSteppedValue(c){
+  var min=c.randomMin,max=c.randomMax,step=Number(c.step)||1;
+  var count=Math.max(0,Math.floor((max-min)/step));
+  return clamp(min+Math.round(Math.random()*count)*step,min,max);
+}
+function randomiseAllInputs(){
+  Object.keys(byId).forEach(function(id){S[id]=randomSteppedValue(byId[id]);});
+  // Keep the key linked settings internally consistent after randomising all controls.
+  S.stopAge=S.age+Math.floor(Math.random()*(S.years+1));
+  S.crashYear=1+Math.floor(Math.random()*Math.max(1,S.years));
+  S.stopAtEnd=S.stopAge>=S.age+S.years;
+  S.basis0=S.port0;S.preset='custom';$('fundPreset').value='custom';
+  Object.keys(toggles).forEach(function(id){S[id]=Math.random()<0.5;$('tog-'+id).checked=S[id];});
+  syncCrashMax();syncStopRange();Object.keys(byId).forEach(setNumbers);syncEnabled();updatePresetInfo();schedule(true);
+}
+$('randomize').addEventListener('click',randomiseAllInputs);
 var AUD=new Intl.NumberFormat('en-AU',{style:'currency',currency:'AUD',maximumFractionDigits:0});function aud(v){return AUD.format(Math.round(v||0)).replace('-','−');}function signed(v){var r=Math.round(v||0);return(r<0?'−':'+')+AUD.format(Math.abs(r));}function short(v){var a=Math.abs(v);if(a>=1e6)return(v<0?'−':'')+'$'+(a/1e6).toFixed(a>=1e7?0:1).replace(/\.0$/,'')+'M';if(a>=1e3)return(v<0?'−':'')+'$'+Math.round(a/1e3)+'k';return(v<0?'−':'')+'$'+Math.round(a);}
 function cssVar(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
 function hexRgba(hex,a){var h=hex.replace('#','');if(h.length===3)h=h.split('').map(function(x){return x+x;}).join('');var n=parseInt(h,16);return'rgba('+(n>>16&255)+','+(n>>8&255)+','+(n&255)+','+a+')';}
@@ -310,10 +419,10 @@ function render(){var Y=S.years,N=Y*PPY,rng=makeRng(BASE_SEED),deployedAmounts=[
  for(var s=0;s<SIMS;s++){var shocks=annualShocks(S.vol,S.fxVol,Y,rng),std=simulate(S,false,shocks),opt=simulate(S,true,shocks);deployedAmounts.push(opt.deployed);for(var y=0;y<=Y;y++){var i=y,deflator=S.realOn?Math.pow(1+S.infl/100,y):1;var optTax=cgtFor(opt,i,S),stdTax=cgtFor(std,i,S),optNW=(opt.port[i]+opt.hy[i]-optTax)/deflator,stdNW=(std.port[i]+std.hy[i]-stdTax)/deflator,op=opt.port[i]/deflator,oh=opt.hy[i]/deflator,cgt=optTax/deflator;series.optNW[y].push(optNW);series.stdNW[y].push(stdNW);series.optPort[y].push(op);series.optHy[y].push(oh);series.optCGT[y].push(cgt);series.alpha[y].push(optNW-stdNW);if(optNW>=S.target)hitByYear[y]++;}}
  var medOpt=[],medStd=[],medPort=[],medHy=[],medCGT=[],medAlpha=[],lo=[],hi=[],pctByYear=[];for(var y=0;y<=Y;y++){medOpt[y]=quantile(series.optNW[y],.5);medStd[y]=quantile(series.stdNW[y],.5);medPort[y]=quantile(series.optPort[y],.5);medHy[y]=quantile(series.optHy[y],.5);medCGT[y]=quantile(series.optCGT[y],.5);medAlpha[y]=quantile(series.alpha[y],.5);lo[y]=quantile(series.optNW[y],.1);hi[y]=quantile(series.optNW[y],.9);pctByYear[y]=hitByYear[y]/SIMS*100;}
  for(var y=0;y<=Y;y++){if(firstYear75===null&&pctByYear[y]>=75)firstYear75=y;}
- mainChart.data.datasets[0].data=mk(medOpt);mainChart.data.datasets[1].data=mk(medStd);mainChart.data.datasets[2].data=mk(medPort);mainChart.data.datasets[3].data=mk(medHy);mainChart.data.datasets[4].data=mk(lo);mainChart.data.datasets[5].data=mk(hi);alphaChart.data.datasets[0].data=mk(medAlpha);var step=Y<=10?1:Y<=24?2:5;[mainChart,alphaChart].forEach(function(ch){ch.options.scales.x.max=Y;ch.options.scales.x.ticks.stepSize=step;});view.crashYear=S.crashOn?S.crashYear:null;view.stopYear=(S.stopAge>S.age&&S.stopAge<S.age+Y)?S.stopAge-S.age:null;mainChart.options.scales.y.suggestedMax=S.target*1.06;mainChart.options.scales.y.title.text=S.realOn?"After-tax net worth (today's $ AUD)":'After-tax net worth ($ AUD)';alphaChart.options.scales.y.title.text=S.realOn?"Alpha (today's $ AUD)":'Alpha ($ AUD)';$('tbl-sum').textContent=S.realOn?"Year-by-year table (today's dollars)":'Year-by-year table';animateChartUpdate(mainChart);animateChartUpdate(alphaChart);
+ mainChart.data.datasets[0].data=mk(medOpt);mainChart.data.datasets[1].data=mk(medStd);mainChart.data.datasets[2].data=mk(medPort);mainChart.data.datasets[3].data=mk(medHy);mainChart.data.datasets[4].data=mk(lo);mainChart.data.datasets[5].data=mk(hi);alphaChart.data.datasets[0].data=mk(medAlpha);var step=Y<=10?1:Y<=24?2:5;[mainChart,alphaChart].forEach(function(ch){ch.options.scales.x.max=Math.max(Y,1);ch.options.scales.x.ticks.stepSize=step;});view.crashYear=S.crashOn?S.crashYear:null;view.stopYear=(S.stopAge>S.age&&S.stopAge<S.age+Y)?S.stopAge-S.age:null;mainChart.options.scales.y.suggestedMax=S.target*1.06;mainChart.options.scales.y.title.text=S.realOn?"After-tax net worth (today's $ AUD)":'After-tax net worth ($ AUD)';alphaChart.options.scales.y.title.text=S.realOn?"Alpha (today's $ AUD)":'Alpha ($ AUD)';$('tbl-sum').textContent=S.realOn?"Year-by-year table (today's dollars)":'Year-by-year table';animateChartUpdate(mainChart);animateChartUpdate(alphaChart);
  var endNW=medOpt[Y],stdNW=medStd[Y],alpha=medAlpha[Y],prob=pctByYear[Y],medianDeployed=quantile(deployedAmounts,.5),prin=Math.max(0,S.hysa0-medianDeployed);var inflFactor=S.realOn?Math.pow(1+S.infl/100,Y):1;var deployedText='';
  $('atyear').textContent='At the end of year '+Y+(S.realOn?", in today's dollars":'');animateMetric('c-nw',aud(endNW));$('c-nw-n').textContent='Median across paths · standard DCA: '+aud(stdNW);animateMetric('c-port',aud(medPort[Y]));$('c-port-n').textContent='Estimated CGT on sale: '+aud(medCGT[Y]);animateMetric('c-hysa',aud(medHy[Y]));var principalAfter=prin/inflFactor,interestAfter=medHy[Y]-principalAfter;$('c-hysa-n').textContent=aud(principalAfter)+' principal, '+aud(interestAfter)+' after-tax interest';animateMetric('c-alpha',signed(alpha));$('c-alpha-n').textContent='Median matched-path difference vs standard DCA';
- $('tgt-k').textContent='Chance of reaching '+aud(S.target)+(S.realOn?" in today's dollars":'')+' by age '+(S.age+Y);animateMetric('tgt-v',prob.toFixed(1)+'%');var range=aud(lo[Y])+' to '+aud(hi[Y]);var targetNote='<strong>'+prob.toFixed(1)+'% of '+SIMS+' simulated paths</strong> finish at or above the target. Median after-tax net worth is '+aud(endNW)+'; the 10th–90th percentile range is '+range+'.';if(firstYear75!==null){targetNote+=' The first age with at least a 75% simulated chance of being at/above target is '+(S.age+firstYear75)+'.';}else{targetNote+=' No age within this horizon reaches a 75% simulated chance.';}$('tgt-note').innerHTML=targetNote;
+ if(S.target>0){$('tgt-k').textContent='Chance of reaching '+aud(S.target)+(S.realOn?" in today's dollars":'')+' by age '+(S.age+Y);animateMetric('tgt-v',prob.toFixed(1)+'%');var range=aud(lo[Y])+' to '+aud(hi[Y]);var targetNote='<strong>'+prob.toFixed(1)+'% of '+SIMS+' simulated paths</strong> finish at or above the target. Median after-tax net worth is '+aud(endNW)+'; the 10th–90th percentile range is '+range+'.';if(firstYear75!==null){targetNote+=' The first age with at least a 75% simulated chance of being at/above target is '+(S.age+firstYear75)+'.';}else{targetNote+=' No age within this horizon reaches a 75% simulated chance.';}$('tgt-note').innerHTML=targetNote;}else{$('tgt-k').textContent='Target probability';$('tgt-v').textContent='—';$('tgt-note').textContent='Set a target above $0 or choose Randomise all to explore a sample scenario.';}
  var msg;if(!S.crashOn){msg='Cash-deployment crash scenario is off.';}else{var theoretical=[];[[S.t1Depth,S.t1],[S.t2Depth,S.t2],[S.t3Depth,S.t3]].forEach(function(t){if(S.depth>=t[0]&&t[1]>0)theoretical.push(t[1]);});msg='<strong>Year '+S.crashYear+':</strong> the '+S.depth+'% drawdown setting reaches '+theoretical.length+' of 3 cash tiers using your custom tier triggers ('+S.t1Depth+'%, '+S.t2Depth+'%, '+S.t3Depth+'%). '+(S.priceOn?'The price path also applies a drawdown and recovery over '+S.recovery+(S.recovery===1?' year.':' years.'):'Price drawdown is off; tier transfers can occur without changing the simulated share-price path.');}var yrs=Math.max(0,Math.min(S.stopAge-S.age,Y)),paid=sumRange(S.dca,S.raise,0,yrs)+sumRange(S.postDca,S.raise,yrs,Y),rtxt=S.raise>0?', increased '+S.raise+'% each year':'';var dmsg=S.stopAge>=S.age+Y?'DCA of '+aud(S.dca)+' per fortnight'+rtxt+' runs all '+Y+' years; total scheduled contributions: '+aud(paid)+'.':'DCA is '+aud(S.dca)+' per fortnight'+rtxt+' until age '+S.stopAge+', then '+(S.postDca>0?aud(S.postDca)+' per fortnight':'$0')+'. Total scheduled contributions: '+aud(paid)+'.';$('status').innerHTML=msg+'<br>'+dmsg+'<br>Returns are annualised geometric assumptions; the bands and target probability come from '+SIMS+' reproducible paths.';
  var rows=[];for(var y=0;y<=Y;y++){rows.push('<tr'+(S.crashOn&&y===S.crashYear?' class="crash"':'')+'><td>'+y+'</td><td>'+(S.age+y)+'</td><td>'+aud(medStd[y])+'</td><td>'+aud(medPort[y])+'</td><td>'+aud(medHy[y])+'</td><td>'+aud(medCGT[y])+'</td><td>'+aud(medOpt[y])+'</td><td>'+signed(medAlpha[y])+'</td><td>'+aud(lo[y])+' – '+aud(hi[y])+'</td></tr>');}$('tbody').innerHTML=rows.join('');$('main').setAttribute('aria-label','Monte Carlo projection over '+Y+' years; median after-tax net worth ends at '+aud(endNW)+'; target probability '+prob.toFixed(1)+' percent.');$('alpha').setAttribute('aria-label','Median alpha over '+Y+' years, ending at '+signed(alpha)+'.');
 }
@@ -336,8 +445,8 @@ function bindInfoButtons(){
  document.addEventListener('keydown',function(e){if(e.key==='Escape'){document.querySelectorAll('.info-wrap.open').forEach(function(w){w.classList.remove('open');var b=w.querySelector('.info-btn');if(b)b.setAttribute('aria-expanded','false');});}});
 }
 
-// AI Wealth Copilot integration. Set this to the URL of your deployed Cloudflare Worker.
-var AI_API_URL = "https://wealth-modelling.vercel.app/api/copilot";
+// AI Wealth Copilot calls the secure Vercel server-side function.
+var AI_API_URL = 'https://wealth-modelling.vercel.app/api/copilot';
 function aiSnapshot(){
   var inputs={};
   Object.keys(S).forEach(function(k){var v=S[k];if(typeof v==='number'||typeof v==='boolean'||typeof v==='string')inputs[k]=v;});
@@ -360,10 +469,32 @@ function aiSnapshot(){
   };
 }
 function aiSetStatus(msg){$('ai-status').textContent=msg;}
-function aiAnswer(text,isError){var el=$('ai-answer');el.textContent=text;el.classList.toggle('ai-error',!!isError);}
+var aiCurrentReply=null;
+function aiAppendMessage(text,role,isError){
+  var container=$('ai-answer');
+  var bubble=document.createElement('div');
+  bubble.className='ai-message '+role+(isError?' ai-error':'');
+  bubble.textContent=text;
+  container.appendChild(bubble);
+  container.scrollTop=container.scrollHeight;
+  return bubble;
+}
+function aiAnswer(text,isError){
+  var container=$('ai-answer');
+  if(text===''){
+    aiCurrentReply=aiAppendMessage('Thinking…','assistant',false);
+    return;
+  }
+  if(!aiCurrentReply)aiCurrentReply=aiAppendMessage('','assistant',false);
+  aiCurrentReply.textContent=text;
+  aiCurrentReply.classList.toggle('ai-error',!!isError);
+  container.scrollTop=container.scrollHeight;
+  aiCurrentReply=null;
+}
 async function askWealthCopilot(){
   var question=$('ai-question').value.trim();
   if(!question){aiSetStatus('Add a question first');$('ai-question').focus();return;}
+  aiAppendMessage(question,'user',false);
   var btn=$('ai-send');btn.disabled=true;btn.textContent='Thinking…';aiSetStatus('Connecting to Gemini…');aiAnswer('');
   try{
     var controller=new AbortController();var timeout=setTimeout(function(){controller.abort();},45000);
@@ -372,11 +503,16 @@ async function askWealthCopilot(){
     if(!response.ok)throw new Error(data.error||('Request failed ('+response.status+').'));
     if(!data.answer)throw new Error('The AI service returned an empty response. Please try again.');
     aiAnswer(data.answer,false);aiSetStatus('Response ready');
-  }catch(err){var message=err.name==='AbortError'?'The request took too long. Please try again.':(err.message||'Could not reach the AI service.');aiAnswer(message+' If this continues, check that the Worker is deployed, its Gemini secret is set, and the website origin is allowed.',true);aiSetStatus('Connection issue');}
-  finally{btn.disabled=false;btn.textContent='Ask Wealth Copilot';}
+  }catch(err){var message=err.name==='AbortError'?'The request took too long. Please try again.':(err.message||'Could not reach the AI service.');aiAnswer(message+' If this continues, check the Vercel deployment, its GEMINI_API_KEY setting, and the Gemini API response.',true);aiSetStatus('Connection issue');}
+  finally{btn.disabled=false;btn.textContent='Send message';}
 }
 $('ai-send').addEventListener('click',askWealthCopilot);
-$('ai-question').addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&e.key==='Enter')askWealthCopilot();});
+$('ai-question').addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();askWealthCopilot();}});
+$('ai-launcher').addEventListener('click',function(){var panel=$('ai-chat-window');panel.classList.add('is-open');panel.setAttribute('aria-hidden','false');$('ai-launcher').setAttribute('aria-expanded','true');$('ai-question').focus();});
+$('ai-close').addEventListener('click',function(){var panel=$('ai-chat-window');panel.classList.remove('is-open','is-wide','is-fullscreen');panel.setAttribute('aria-hidden','true');$('ai-launcher').setAttribute('aria-expanded','false');$('ai-launcher').focus();});
+$('ai-size-toggle').addEventListener('click',function(){var panel=$('ai-chat-window'),wide=!panel.classList.contains('is-wide');panel.classList.remove('is-fullscreen');panel.classList.toggle('is-wide',wide);this.setAttribute('aria-pressed',String(wide));this.setAttribute('aria-label',wide?'Use normal chat size':'Widen chat');this.title=wide?'Use normal chat size':'Widen chat';});
+$('ai-fullscreen').addEventListener('click',function(){var panel=$('ai-chat-window'),full=!panel.classList.contains('is-fullscreen');panel.classList.toggle('is-fullscreen',full);panel.classList.remove('is-wide');$('ai-size-toggle').setAttribute('aria-pressed','false');this.setAttribute('aria-pressed',String(full));this.setAttribute('aria-label',full?'Exit full screen':'Open full screen');this.title=full?'Exit full screen':'Open full screen';});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&$('ai-chat-window').classList.contains('is-open'))$('ai-close').click();});
 document.querySelectorAll('[data-ai-prompt]').forEach(function(b){b.addEventListener('click',function(){$('ai-question').value=b.getAttribute('data-ai-prompt');$('ai-question').focus();});});
 
 syncCrashMax();syncEnabled();syncStopRange();$('fundPreset').value=S.preset;updatePresetInfo();applyTheme();initLayoutControls();render();
