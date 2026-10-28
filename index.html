@@ -129,6 +129,11 @@ body::before{animation:glow-breathe 18s ease-in-out infinite}
 .ai-window-btn{display:grid;place-items:center;width:30px;height:30px;border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--ink);font:600 17px/1 var(--font-ui);cursor:pointer}
 .ai-window-btn:hover{background:var(--hl);border-color:var(--s1)}
 .ai-close-btn{font-size:22px}
+.ai-model-picker{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:6px 10px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);flex:none}
+.ai-model-picker label{font-size:11px;font-weight:700;color:var(--muted)}
+.ai-model-picker select{width:100%;min-width:0;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--field);color:var(--ink);font:inherit;font-size:12px}
+.ai-model-picker select:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+.ai-model-note{grid-column:1/-1;color:var(--muted);font-size:10.5px;line-height:1.4}
 .ai-chat-body{display:flex;flex-direction:column;gap:10px;min-height:0;flex:1;padding:11px}
 .ai-chat-body .ai-prompts{flex:none;max-height:67px;overflow:auto;align-content:flex-start;gap:5px}
 .ai-chat-body .ai-chip{font-size:10.5px;padding:5px 8px}
@@ -136,7 +141,24 @@ body::before{animation:glow-breathe 18s ease-in-out infinite}
 .ai-answer:empty{display:flex}
 .ai-message{max-width:94%;align-self:flex-start;border:1px solid var(--line);border-radius:13px 13px 13px 4px;padding:10px 12px;background:var(--surface);color:var(--ink);font-size:12.5px;line-height:1.58;white-space:pre-wrap;overflow-wrap:anywhere}
 .ai-message.user{align-self:flex-end;border-color:transparent;border-radius:13px 13px 4px 13px;background:var(--s1);color:#fff}
-.ai-message.ai-error{border-color:#e6a397;color:#a63a26;background:color-mix(in srgb,#fbe9e5 65%,var(--surface))}
+ .ai-message.ai-error{border-color:#e6a397;color:#a63a26;background:color-mix(in srgb,#fbe9e5 65%,var(--surface))}
+/* Render Copilot answers as readable, safe Markdown rather than one raw text block. */
+.ai-message.assistant{white-space:normal;line-height:1.65}
+.ai-message.assistant p{margin:0 0 .78em}
+.ai-message.assistant p:last-child{margin-bottom:0}
+.ai-message.assistant h1,.ai-message.assistant h2,.ai-message.assistant h3{color:var(--ink);line-height:1.3;letter-spacing:-.02em;margin:1em 0 .45em}
+.ai-message.assistant h1{font-size:1.18em}
+.ai-message.assistant h2{font-size:1.1em}
+.ai-message.assistant h3{font-size:1.04em}
+.ai-message.assistant h1:first-child,.ai-message.assistant h2:first-child,.ai-message.assistant h3:first-child{margin-top:0}
+.ai-message.assistant ul,.ai-message.assistant ol{margin:.2em 0 .85em;padding-left:1.45em}
+.ai-message.assistant li{padding-left:.12em;margin:.22em 0}
+.ai-message.assistant li::marker{color:var(--s1)}
+.ai-message.assistant hr{height:1px;border:0;background:var(--line);margin:1em 0}
+.ai-message.assistant blockquote{margin:.5em 0 .85em;padding:.45em .8em;border-left:3px solid var(--s1);background:var(--hl);border-radius:0 7px 7px 0;color:var(--muted)}
+.ai-message.assistant code{font: .92em var(--font-num);background:var(--hl);border:1px solid var(--line);border-radius:5px;padding:.08em .3em;overflow-wrap:anywhere}
+.ai-message.assistant a{color:var(--s1);text-decoration:underline;text-underline-offset:2px}
+.ai-message.assistant strong{font-weight:750;color:var(--ink)}
 .ai-chat-body .ai-question{min-height:66px;max-height:160px;resize:vertical;font-size:12.5px;padding:10px 11px}
 .ai-chat-body .ai-actions{flex:none;gap:8px}
 .ai-chat-body .ai-send{min-width:112px;padding:9px 13px}
@@ -160,105 +182,6 @@ body::before{animation:glow-breathe 18s ease-in-out infinite}
 }
 @media(prefers-reduced-motion:reduce){.ai-launcher{transition:none}.ai-answer{scroll-behavior:auto}}
 
-/* Wealth Copilot: clean Markdown response formatting */
-.ai-message.assistant {
-  white-space: normal;
-  line-height: 1.7;
-  font-size: 13px;
-  overflow-wrap: anywhere;
-}
-
-.ai-message.assistant p {
-  margin: 0 0 12px;
-}
-
-.ai-message.assistant p:last-child {
-  margin-bottom: 0;
-}
-
-.ai-message.assistant h1,
-.ai-message.assistant h2,
-.ai-message.assistant h3 {
-  color: var(--ink);
-  line-height: 1.35;
-  letter-spacing: -0.02em;
-  margin: 18px 0 8px;
-  font-weight: 750;
-}
-
-.ai-message.assistant h1 {
-  font-size: 17px;
-}
-
-.ai-message.assistant h2 {
-  font-size: 15px;
-}
-
-.ai-message.assistant h3 {
-  font-size: 14px;
-}
-
-.ai-message.assistant h1:first-child,
-.ai-message.assistant h2:first-child,
-.ai-message.assistant h3:first-child {
-  margin-top: 0;
-}
-
-.ai-message.assistant ul,
-.ai-message.assistant ol {
-  margin: 5px 0 14px;
-  padding-left: 22px;
-}
-
-.ai-message.assistant li {
-  padding-left: 3px;
-  margin: 6px 0;
-}
-
-.ai-message.assistant li::marker {
-  color: var(--s1);
-}
-
-.ai-message.assistant hr {
-  border: 0;
-  border-top: 1px solid var(--line);
-  margin: 16px 0;
-}
-
-.ai-message.assistant blockquote {
-  margin: 10px 0 14px;
-  padding: 10px 13px;
-  border-left: 3px solid var(--s1);
-  background: var(--hl);
-  border-radius: 0 8px 8px 0;
-  color: var(--muted);
-}
-
-.ai-message.assistant code {
-  font-family: var(--font-num);
-  font-size: 0.9em;
-  background: var(--hl);
-  border: 1px solid var(--line);
-  border-radius: 5px;
-  padding: 2px 5px;
-  overflow-wrap: anywhere;
-}
-
-.ai-message.assistant strong {
-  color: var(--ink);
-  font-weight: 750;
-}
-
-.ai-message.assistant em {
-  font-style: italic;
-}
-
-.ai-message.assistant a {
-  color: var(--s1);
-  text-decoration: underline;
-  overflow-wrap: anywhere;
-}
-  
 </style>
 </head>
 <body>
@@ -325,6 +248,15 @@ body::before{animation:glow-breathe 18s ease-in-out infinite}
     <div class="ai-status" id="ai-status" aria-live="polite">Ready</div>
   </div>
   <div class="ai-chat-body">
+    <div class="ai-model-picker">
+      <label for="ai-model">AI model</label>
+      <select id="ai-model" aria-label="Choose the Gemini model">
+        <option value="gemini-3.5-flash-lite" selected>Gemini 3.5 Flash-Lite — Efficient</option>
+        <option value="gemini-3.6-flash">Gemini 3.6 Flash — Balanced</option>
+        <option value="gemini-3.8-flash">Gemini 3.8 Flash — More capable</option>
+      </select>
+      <span class="ai-model-note">Applies to your next message. Model access and quotas depend on your Gemini API account.</span>
+    </div>
     <div class="ai-prompts" aria-label="Suggested questions">
       <button type="button" class="ai-chip" data-ai-prompt="Explain the main drivers of my projected wealth and the biggest uncertainties.">Explain my results</button>
       <button type="button" class="ai-chip" data-ai-prompt="Compare my selected cash-deployment strategy with standard DCA. Explain the limitations and avoid assuming market timing will work.">Compare strategies</button>
@@ -567,270 +499,139 @@ function aiSnapshot(){
     modelNotes:'AUD model using historical-return assumptions and 300 reproducible Monte Carlo paths. Estimates simplify Australian tax, CGT, fund distributions, currency effects and market behaviour. Not a forecast or personal financial advice.'
   };
 }
-function aiSetStatus(msg) {
-  $('ai-status').textContent = msg;
+function aiSetStatus(msg){$('ai-status').textContent=msg;}
+var aiCurrentReply=null;
+function normalizeAIResponse(raw){
+  var text=String(raw==null?'':raw).replace(/\r\n?/g,'\n');
+  // Some model responses arrive with escaped line breaks/Markdown punctuation.
+  text=text.replace(/\\n/g,'\n').replace(/\\r/g,'');
+  text=text.replace(/\\[ \t]*\n/g,'\n');
+  text=text.replace(/\\([*#_`>\-.!()])/g,'$1');
+  text=text.replace(/&#x20;/gi,' ').replace(/&nbsp;/gi,' ')
+    .replace(/&amp;/gi,'&').replace(/&lt;/gi,'<').replace(/&gt;/gi,'>')
+    .replace(/&quot;/gi,'"').replace(/&#39;/gi,"'");
+  return text.replace(/\u00a0/g,' ').replace(/[ \t]+\n/g,'\n').replace(/\n{3,}/g,'\n\n').trim();
 }
-
-var aiCurrentReply = null;
-
-// Clean up escaped Markdown and inconsistent whitespace.
-function normalizeAIResponse(raw) {
-  return String(raw == null ? '' : raw)
-    .replace(/\r\n?/g, '\n')
-    .replace(/\\n/g, '\n')
-    .replace(/\\r/g, '')
-    .replace(/\\([*#_`>+.!()])/g, '$1')
-    .replace(/&#x20;/gi, ' ')
-    .replace(/&nbsp;/gi, ' ')
-    .replace(/&amp;/gi, '&')
-    .replace(/&lt;/gi, '<')
-    .replace(/&gt;/gi, '>')
-    .replace(/&quot;/gi, '"')
-    .replace(/&#39;/gi, "'")
-    .replace(/\u00a0/g, ' ')
-    .replace(/[ \t]+\n/g, '\n')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim();
+function escapeMarkdownHTML(text){
+  return String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
-
-// Escape source text before inserting any formatting.
-function escapeAIHTML(text) {
-  return String(text)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
-// Format inline Markdown: bold, italics and inline code.
-function renderAIInline(raw) {
-  var codeParts = [];
-
-  var text = String(raw).replace(/`([^`\n]+)`/g, function(_, code) {
-    var key = '@@AICODE' + codeParts.length + '@@';
-    codeParts.push(escapeAIHTML(code));
+function renderAIInline(raw){
+  var codeParts=[];
+  var text=String(raw).replace(/`([^`\n]+)`/g,function(_,code){
+    var key='@@AICODE'+codeParts.length+'@@';
+    codeParts.push(escapeMarkdownHTML(code));
     return key;
   });
-
-  text = escapeAIHTML(text);
-
-  text = text
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/__(.+?)__/g, '<strong>$1</strong>')
-    .replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, '$1<em>$2</em>')
-    .replace(/(^|[^_])_([^_\n]+)_(?!_)/g, '$1<em>$2</em>');
-
-  text = text.replace(/@@AICODE(\d+)@@/g, function(_, index) {
-    return '<code>' + codeParts[Number(index)] + '</code>';
-  });
-
+  text=escapeMarkdownHTML(text);
+  text=text.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/__(.+?)__/g,'<strong>$1</strong>')
+    .replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g,'$1<em>$2</em>')
+    .replace(/(^|[^_])_([^_\n]+)_(?!_)/g,'$1<em>$2</em>');
+  text=text.replace(/@@AICODE(\d+)@@/g,function(_,i){return '<code>'+codeParts[Number(i)]+'</code>';});
   return text;
 }
-
-// Convert common Markdown into safe, readable HTML.
-function renderAIMarkdown(raw) {
-  var text = normalizeAIResponse(raw);
-
-  if (!text) return '';
-
-  var lines = text.split('\n');
-  var html = [];
-  var paragraph = [];
-  var listType = null;
-  var listItems = [];
-  var quoteLines = [];
-
-  function flushParagraph() {
-    if (!paragraph.length) return;
-
-    html.push(
-      '<p>' +
-      renderAIInline(paragraph.join(' ').trim()) +
-      '</p>'
-    );
-
-    paragraph = [];
+function renderAIMarkdown(raw){
+  var text=normalizeAIResponse(raw);
+  if(!text)return '';
+  var lines=text.split('\n'),html=[],paragraph=[],listType=null,listItems=[],quoteLines=[];
+  function flushParagraph(){
+    if(!paragraph.length)return;
+    html.push('<p>'+renderAIInline(paragraph.join(' ').trim())+'</p>');
+    paragraph=[];
   }
-
-  function flushList() {
-    if (!listType || !listItems.length) {
-      listType = null;
-      listItems = [];
-      return;
-    }
-
-    html.push(
-      '<' + listType + '>' +
-      listItems.map(function(item) {
-        return '<li>' + renderAIInline(item) + '</li>';
-      }).join('') +
-      '</' + listType + '>'
-    );
-
-    listType = null;
-    listItems = [];
+  function flushList(){
+    if(!listType||!listItems.length){listType=null;listItems=[];return;}
+    html.push('<'+listType+'>'+listItems.map(function(item){return '<li>'+renderAIInline(item)+'</li>';}).join('')+'</'+listType+'>');
+    listType=null;listItems=[];
   }
-
-  function flushQuote() {
-    if (!quoteLines.length) return;
-
-    html.push(
-      '<blockquote>' +
-      quoteLines.map(function(line) {
-        return '<p>' + renderAIInline(line) + '</p>';
-      }).join('') +
-      '</blockquote>'
-    );
-
-    quoteLines = [];
+  function flushQuote(){
+    if(!quoteLines.length)return;
+    html.push('<blockquote><p>'+quoteLines.map(function(line){return renderAIInline(line);}).join('<br>')+'</p></blockquote>');
+    quoteLines=[];
   }
-
-  function flushAll() {
-    flushParagraph();
-    flushList();
-    flushQuote();
-  }
-
-  lines.forEach(function(original) {
-    var line = original.trim();
-
-    if (!line) {
-      flushAll();
-      return;
-    }
-
-    // Markdown headings.
-    var heading = line.match(/^(#{1,3})\s+(.+)$/);
-
-    if (heading) {
-      flushAll();
-
-      var level = heading[1].length === 1 ? 2 : 3;
-
-      html.push(
-        '<h' + level + '>' +
-        renderAIInline(heading[2]) +
-        '</h' + level + '>'
-      );
-
-      return;
-    }
-
-    // Horizontal dividers.
-    if (/^(-{3,}|\*{3,}|_{3,})$/.test(line)) {
-      flushAll();
-      html.push('<hr>');
-      return;
-    }
-
-    // Blockquotes.
-    var quote = line.match(/^>\s?(.*)$/);
-
-    if (quote) {
+  function flushBlocks(){flushParagraph();flushList();flushQuote();}
+  lines.forEach(function(original){
+    var line=original.trim();
+    if(!line){flushBlocks();return;}
+    var heading=line.match(/^(#{1,3})\s+(.+)$/);
+    if(heading){flushBlocks();var level=Math.min(3,Number(heading[1].length)+1);html.push('<h'+level+'>'+renderAIInline(heading[2])+'</h'+level+'>');return;}
+    if(/^(-{3,}|\*{3,}|_{3,})$/.test(line)){flushBlocks();html.push('<hr>');return;}
+    var quote=line.match(/^>\s?(.*)$/);
+    if(quote){flushParagraph();flushList();quoteLines.push(quote[1]);return;}else if(quoteLines.length){flushQuote();}
+    var bullet=line.match(/^[-*+]\s+(.+)$/);
+    var ordered=line.match(/^\d+[.)]\s+(.+)$/);
+    if(bullet||ordered){
       flushParagraph();
-      flushList();
-      quoteLines.push(quote[1]);
-      return;
+      var wanted=ordered?'ol':'ul';
+      if(listType&&listType!==wanted)flushList();
+      listType=wanted;listItems.push((bullet||ordered)[1]);return;
     }
-
-    if (quoteLines.length) {
-      flushQuote();
-    }
-
-    // Bulleted or numbered lists.
-    var bullet = line.match(/^[-*+]\s+(.+)$/);
-    var ordered = line.match(/^\d+[.)]\s+(.+)$/);
-
-    if (bullet || ordered) {
-      flushParagraph();
-
-      var wantedType = ordered ? 'ol' : 'ul';
-
-      if (listType && listType !== wantedType) {
-        flushList();
-      }
-
-      listType = wantedType;
-      listItems.push((bullet || ordered)[1]);
-
-      return;
-    }
-
-    if (listType) {
-      flushList();
-    }
-
+    if(listType)flushList();
     paragraph.push(line);
   });
-
-  flushAll();
-
+  flushBlocks();
   return html.join('');
 }
-
-// Add a message bubble to the chat.
-function aiAppendMessage(text, role, isError) {
-  var container = $('ai-answer');
-  var bubble = document.createElement('div');
-
-  bubble.className =
-    'ai-message ' + role + (isError ? ' ai-error' : '');
-
-  // Plain text is used by default; formatting is applied separately.
-  bubble.textContent = text;
-
+function aiAppendMessage(text,role,isError){
+  var container=$('ai-answer');
+  var bubble=document.createElement('div');
+  bubble.className='ai-message '+role+(isError?' ai-error':'');
+  if(role==='assistant'&&text!=='Thinking…'&&!isError)bubble.innerHTML=renderAIMarkdown(text);
+  else bubble.textContent=text;
   container.appendChild(bubble);
-  container.scrollTop = container.scrollHeight;
-
+  container.scrollTop=container.scrollHeight;
   return bubble;
 }
-
-// Display or update the assistant's response bubble.
-function aiAnswer(text, isError) {
-  var container = $('ai-answer');
-
-  // Start a new Thinking bubble while the request is running.
-  if (text === '') {
-    aiCurrentReply = aiAppendMessage(
-      'Thinking…',
-      'assistant',
-      false
-    );
+function aiAnswer(text,isError){
+  var container=$('ai-answer');
+  if(text===''){
+    aiCurrentReply=aiAppendMessage('Thinking…','assistant',false);
     return;
   }
-
-  if (!aiCurrentReply) {
-    aiCurrentReply = aiAppendMessage('', 'assistant', false);
-  }
-
-  if (isError) {
-    // Errors remain plain text.
-    aiCurrentReply.textContent = text;
-  } else {
-    // Render formatted Markdown without interpreting AI text as raw HTML.
-    aiCurrentReply.innerHTML = renderAIMarkdown(text);
-  }
-
-  aiCurrentReply.classList.toggle('ai-error', !!isError);
-
-  container.scrollTop = container.scrollHeight;
-  aiCurrentReply = null;
+  if(!aiCurrentReply)aiCurrentReply=aiAppendMessage('','assistant',false);
+  if(isError)aiCurrentReply.textContent=text;
+  else aiCurrentReply.innerHTML=renderAIMarkdown(text);
+  aiCurrentReply.classList.toggle('ai-error',!!isError);
+  container.scrollTop=container.scrollHeight;
+  aiCurrentReply=null;
 }
 async function askWealthCopilot(){
   var question=$('ai-question').value.trim();
   if(!question){aiSetStatus('Add a question first');$('ai-question').focus();return;}
   aiAppendMessage(question,'user',false);
-  var btn=$('ai-send');btn.disabled=true;btn.textContent='Thinking…';aiSetStatus('Connecting to Gemini…');aiAnswer('');
+  $('ai-question').value='';
+  var selectedModel=$('ai-model').value;
+  var selectedModelLabel=$('ai-model').selectedOptions[0].textContent.trim();
+  var btn=$('ai-send');
+  btn.disabled=true;
+  btn.textContent='Thinking…';
+  aiSetStatus('Connecting to '+selectedModelLabel+'…');
+  aiAnswer('');
   try{
-    var controller=new AbortController();var timeout=setTimeout(function(){controller.abort();},45000);
-    var response=await fetch(AI_API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:question,context:aiSnapshot()}),signal:controller.signal});clearTimeout(timeout);
+    var controller=new AbortController();
+    var timeout=setTimeout(function(){controller.abort();},45000);
+    var response=await fetch(AI_API_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({question:question,context:aiSnapshot(),model:selectedModel}),
+      signal:controller.signal
+    });
+    clearTimeout(timeout);
     var data=await response.json().catch(function(){return{};});
     if(!response.ok)throw new Error(data.error||('Request failed ('+response.status+').'));
     if(!data.answer)throw new Error('The AI service returned an empty response. Please try again.');
-    aiAnswer(data.answer,false);aiSetStatus('Response ready');
-  }catch(err){var message=err.name==='AbortError'?'The request took too long. Please try again.':(err.message||'Could not reach the AI service.');aiAnswer(message+' If this continues, check the Vercel deployment, its GEMINI_API_KEY setting, and the Gemini API response.',true);aiSetStatus('Connection issue');}
-  finally{btn.disabled=false;btn.textContent='Send message';}
+    aiAnswer(data.answer,false);
+    aiSetStatus('Response ready · '+selectedModelLabel);
+  }catch(err){
+    var message=err.name==='AbortError'?'The request took too long. Please try again.':(err.message||'Could not reach the AI service.');
+    aiAnswer(message+' If this continues, check the Vercel deployment, its GEMINI_API_KEY setting, and the selected Gemini model availability.',true);
+    aiSetStatus('Connection issue');
+  }finally{
+    btn.disabled=false;
+    btn.textContent='Send message';
+    $('ai-question').focus();
+  }
 }
 $('ai-send').addEventListener('click',askWealthCopilot);
 $('ai-question').addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();askWealthCopilot();}});
